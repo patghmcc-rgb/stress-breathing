@@ -8,7 +8,7 @@
     :root{
       --bg1:#07111d;
       --bg2:#10243a;
-      --card:rgba(17,32,51,.80);
+      --card:rgba(17,32,51,.82);
       --line:rgba(255,255,255,.08);
       --text:#eef7ff;
       --muted:#a8bfd6;
@@ -37,16 +37,16 @@
       pointer-events:none;
       z-index:0;
       background:
-        radial-gradient(circle at 20% 20%, rgba(255,255,255,.03), transparent 18%),
-        radial-gradient(circle at 80% 30%, rgba(255,255,255,.02), transparent 16%),
-        radial-gradient(circle at 50% 80%, rgba(255,255,255,.025), transparent 18%);
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,.04), transparent 18%),
+        radial-gradient(circle at 80% 30%, rgba(255,255,255,.03), transparent 16%),
+        radial-gradient(circle at 50% 80%, rgba(255,255,255,.03), transparent 18%);
     }
 
     .mist{
       position:absolute;
       border-radius:50%;
-      filter:blur(70px);
-      opacity:.16;
+      filter:blur(55px);
+      opacity:.30;
       animation-timing-function:ease-in-out;
       animation-iteration-count:infinite;
       animation-direction:alternate;
@@ -57,7 +57,7 @@
       height:420px;
       left:6%;
       top:10%;
-      background:rgba(52,211,153,.18);
+      background:rgba(52,211,153,.30);
       animation:float1 18s infinite;
     }
 
@@ -66,7 +66,7 @@
       height:480px;
       right:8%;
       top:16%;
-      background:rgba(96,165,250,.18);
+      background:rgba(96,165,250,.30);
       animation:float2 22s infinite;
     }
 
@@ -75,7 +75,7 @@
       height:360px;
       left:18%;
       bottom:8%;
-      background:rgba(251,191,36,.12);
+      background:rgba(251,191,36,.22);
       animation:float3 20s infinite;
     }
 
@@ -84,7 +84,7 @@
       height:320px;
       right:18%;
       bottom:12%;
-      background:rgba(168,85,247,.10);
+      background:rgba(168,85,247,.20);
       animation:float4 24s infinite;
     }
 
@@ -94,7 +94,7 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      opacity:.08;
+      opacity:.18;
       animation:wavePulse 14s ease-in-out infinite;
     }
 
@@ -102,7 +102,7 @@
     .rings::after{
       content:"";
       position:absolute;
-      border:1px solid rgba(255,255,255,.16);
+      border:1px solid rgba(255,255,255,.18);
       border-radius:50%;
     }
 
@@ -138,8 +138,8 @@
     }
 
     @keyframes wavePulse{
-      0%,100%{transform:scale(.98);opacity:.05;}
-      50%{transform:scale(1.04);opacity:.10;}
+      0%,100%{transform:scale(.98);opacity:.08;}
+      50%{transform:scale(1.04);opacity:.18;}
     }
 
     .app{
@@ -790,6 +790,7 @@
     let cyclesCompleted = 0;
     let isRunning = false;
     let audioCtx = null;
+    let holdEndHue = 40;
 
     const presetList = document.getElementById("presetList");
     const orb = document.getElementById("orb");
@@ -842,6 +843,11 @@
 
     function getCurrentPhase() {
       return selectedTechnique.phases[currentPhaseIndex];
+    }
+
+    function getPreviousPhase() {
+      if (currentPhaseIndex === 0) return selectedTechnique.phases[selectedTechnique.phases.length - 1];
+      return selectedTechnique.phases[currentPhaseIndex - 1];
     }
 
     function getCycleSeconds() {
@@ -902,14 +908,20 @@
       setRing("exhale", exhalePercent, "#ef4444", exhalePhase ? exhalePhase.seconds : 0, current.type === "exhale" ? `${phaseRemaining}s left` : exhalePhase ? `${exhalePhase.seconds}s` : "N/A");
     }
 
+    function getInhaleHue(progress) {
+      if (progress < 0.5) {
+        return 0 + (progress / 0.5) * 120;
+      }
+      return 120 + ((progress - 0.5) / 0.5) * 100;
+    }
+
+    function getHoldHue(progress) {
+      return 220 - (progress * 180);
+    }
+
     function getOrbStyle(type, progress) {
       if (type === "inhale") {
-        let hue;
-        if (progress < 0.5) {
-          hue = 0 + (progress / 0.5) * 120;
-        } else {
-          hue = 120 + ((progress - 0.5) / 0.5) * 100;
-        }
+        const hue = getInhaleHue(progress);
         return { hue, sat: 82, light: 52, scale: 0.90 + (progress * 0.30), glowAlpha: 0.28 + (progress * 0.28) };
       }
 
@@ -918,12 +930,15 @@
       }
 
       if (type === "hold") {
-        const hue = 220 - (progress * 180);
+        const hue = getHoldHue(progress);
+        holdEndHue = getHoldHue(1);
         return { hue, sat: 84, light: 54, scale: 1.18, glowAlpha: 0.42 };
       }
 
       if (type === "exhale") {
-        const hue = 220 - (progress * 220);
+        const previous = getPreviousPhase();
+        const startHue = previous && previous.type === "hold" ? holdEndHue : 220;
+        const hue = startHue - (progress * startHue);
         const sat = 82;
         const light = 52 - (progress * 12);
         return { hue, sat, light, scale: 1.16 - (progress * 0.30), glowAlpha: 0.34 - (progress * 0.16) };
@@ -1008,9 +1023,17 @@
       window.speechSynthesis.cancel();
 
       const utter = new SpeechSynthesisUtterance(text);
-      utter.rate = 0.9;
+      utter.rate = 0.85;
       utter.pitch = 1;
       utter.volume = 1;
+
+      const voices = window.speechSynthesis.getVoices();
+      const englishVoice =
+        voices.find(v => v.lang && v.lang.startsWith("en") && /Samantha|Karen|Google US English|Daniel|Alex/i.test(v.name)) ||
+        voices.find(v => v.lang && v.lang.startsWith("en"));
+
+      if (englishVoice) utter.voice = englishVoice;
+
       window.speechSynthesis.speak(utter);
     }
 
@@ -1082,10 +1105,17 @@
       phaseRemaining = selectedTechnique.phases[0].seconds;
       sessionSeconds = 0;
       cyclesCompleted = 0;
+      holdEndHue = 40;
 
       if (render) renderTechniques();
       updateUI();
       stateEl.textContent = "Ready";
+    }
+
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
     }
 
     document.getElementById("startBtn").onclick = startSession;
