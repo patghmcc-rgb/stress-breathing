@@ -8,7 +8,7 @@
     :root{
       --bg1:#07111d;
       --bg2:#10243a;
-      --card:rgba(17,32,51,.82);
+      --card:rgba(17,32,51,.80);
       --line:rgba(255,255,255,.08);
       --text:#eef7ff;
       --muted:#a8bfd6;
@@ -24,7 +24,7 @@
       font-family:Arial, Helvetica, sans-serif;
       color:var(--text);
       background:
-        radial-gradient(circle at top, rgba(90,160,200,.16), transparent 28%),
+        radial-gradient(circle at top, rgba(90,160,200,.10), transparent 28%),
         linear-gradient(180deg,var(--bg1),var(--bg2));
       padding:20px;
       overflow-x:hidden;
@@ -33,90 +33,113 @@
     .zen-bg{
       position:fixed;
       inset:0;
+      overflow:hidden;
       pointer-events:none;
       z-index:0;
-      overflow:hidden;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,.03), transparent 18%),
+        radial-gradient(circle at 80% 30%, rgba(255,255,255,.02), transparent 16%),
+        radial-gradient(circle at 50% 80%, rgba(255,255,255,.025), transparent 18%);
     }
 
-    .zen-orb{
+    .mist{
       position:absolute;
       border-radius:50%;
-      filter:blur(55px);
-      opacity:.18;
+      filter:blur(70px);
+      opacity:.16;
       animation-timing-function:ease-in-out;
       animation-iteration-count:infinite;
       animation-direction:alternate;
     }
 
-    .zen1{
-      width:340px;
-      height:340px;
-      left:8%;
+    .mist1{
+      width:420px;
+      height:420px;
+      left:6%;
       top:10%;
-      background:rgba(96,165,250,.28);
+      background:rgba(52,211,153,.18);
       animation:float1 18s infinite;
     }
 
-    .zen2{
-      width:420px;
-      height:420px;
+    .mist2{
+      width:480px;
+      height:480px;
       right:8%;
-      top:18%;
-      background:rgba(52,211,153,.18);
-      animation:float2 24s infinite;
+      top:16%;
+      background:rgba(96,165,250,.18);
+      animation:float2 22s infinite;
     }
 
-    .zen3{
+    .mist3{
       width:360px;
       height:360px;
       left:18%;
       bottom:8%;
       background:rgba(251,191,36,.12);
-      animation:float3 21s infinite;
+      animation:float3 20s infinite;
     }
 
-    .zen4{
-      width:300px;
-      height:300px;
-      right:20%;
+    .mist4{
+      width:320px;
+      height:320px;
+      right:18%;
       bottom:12%;
-      background:rgba(168,85,247,.15);
-      animation:float4 26s infinite;
+      background:rgba(168,85,247,.10);
+      animation:float4 24s infinite;
+    }
+
+    .rings{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      opacity:.08;
+      animation:wavePulse 14s ease-in-out infinite;
+    }
+
+    .rings::before,
+    .rings::after{
+      content:"";
+      position:absolute;
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:50%;
+    }
+
+    .rings::before{
+      width:520px;
+      height:520px;
+    }
+
+    .rings::after{
+      width:760px;
+      height:760px;
+      opacity:.65;
     }
 
     @keyframes float1{
       from{transform:translate(0,0) scale(1);}
-      to{transform:translate(35px,-22px) scale(1.08);}
+      to{transform:translate(35px,-25px) scale(1.08);}
     }
 
     @keyframes float2{
       from{transform:translate(0,0) scale(1);}
-      to{transform:translate(-28px,24px) scale(1.06);}
+      to{transform:translate(-28px,22px) scale(1.06);}
     }
 
     @keyframes float3{
       from{transform:translate(0,0) scale(1);}
-      to{transform:translate(20px,-30px) scale(1.07);}
+      to{transform:translate(22px,-20px) scale(1.07);}
     }
 
     @keyframes float4{
       from{transform:translate(0,0) scale(1);}
-      to{transform:translate(-18px,20px) scale(1.05);}
+      to{transform:translate(-18px,18px) scale(1.05);}
     }
 
-    .wave-lines{
-      position:absolute;
-      inset:0;
-      opacity:.08;
-      background:
-        radial-gradient(ellipse at center, transparent 58%, rgba(255,255,255,.18) 59%, transparent 60%) center/700px 700px no-repeat,
-        radial-gradient(ellipse at center, transparent 66%, rgba(255,255,255,.12) 67%, transparent 68%) center/900px 900px no-repeat;
-      animation:breathWaves 14s ease-in-out infinite;
-    }
-
-    @keyframes breathWaves{
-      0%,100%{transform:scale(.98); opacity:.05;}
-      50%{transform:scale(1.04); opacity:.10;}
+    @keyframes wavePulse{
+      0%,100%{transform:scale(.98);opacity:.05;}
+      50%{transform:scale(1.04);opacity:.10;}
     }
 
     .app{
@@ -292,7 +315,9 @@
       color:var(--muted);
     }
 
-    .audio-row:last-child{ margin-bottom:0; }
+    .audio-row:last-child{
+      margin-bottom:0;
+    }
 
     input[type="checkbox"]{
       transform:scale(1.1);
@@ -456,7 +481,7 @@
     .bar-fill{
       height:100%;
       width:0%;
-      background:linear-gradient(90deg, #ef4444, #8b5cf6, #60a5fa);
+      background:linear-gradient(90deg, #ef4444, #22c55e, #60a5fa);
       border-radius:999px;
       transition:width .35s linear;
     }
@@ -564,11 +589,11 @@
 </head>
 <body>
   <div class="zen-bg">
-    <div class="zen-orb zen1"></div>
-    <div class="zen-orb zen2"></div>
-    <div class="zen-orb zen3"></div>
-    <div class="zen-orb zen4"></div>
-    <div class="wave-lines"></div>
+    <div class="mist mist1"></div>
+    <div class="mist mist2"></div>
+    <div class="mist mist3"></div>
+    <div class="mist mist4"></div>
+    <div class="rings"></div>
   </div>
 
   <div class="app">
@@ -879,22 +904,31 @@
 
     function getOrbStyle(type, progress) {
       if (type === "inhale") {
-        const hue = 0 + (progress * 220);
+        let hue;
+        if (progress < 0.5) {
+          hue = 0 + (progress / 0.5) * 120;
+        } else {
+          hue = 120 + ((progress - 0.5) / 0.5) * 100;
+        }
         return { hue, sat: 82, light: 52, scale: 0.90 + (progress * 0.30), glowAlpha: 0.28 + (progress * 0.28) };
       }
+
       if (type === "inhale2") {
         return { hue: 220, sat: 88, light: 58, scale: 1.18 + (progress * 0.05), glowAlpha: 0.55 };
       }
+
       if (type === "hold") {
-        const hue = 220 - (progress * 220);
+        const hue = 220 - (progress * 180);
         return { hue, sat: 84, light: 54, scale: 1.18, glowAlpha: 0.42 };
       }
+
       if (type === "exhale") {
-        const hue = 15 - (progress * 15);
-        const sat = 78 - (progress * 16);
-        const light = 50 - (progress * 18);
+        const hue = 220 - (progress * 220);
+        const sat = 82;
+        const light = 52 - (progress * 12);
         return { hue, sat, light, scale: 1.16 - (progress * 0.30), glowAlpha: 0.34 - (progress * 0.16) };
       }
+
       return { hue: 210, sat: 80, light: 50, scale: 1, glowAlpha: 0.35 };
     }
 
@@ -914,7 +948,7 @@
         0 0 55px hsla(${c.hue}, ${c.sat}%, ${c.light}%, ${c.glowAlpha})
       `;
       glow.style.opacity = c.glowAlpha;
-      glow.style.background = `radial-gradient(circle, hsla(${c.hue}, ${c.sat}%, ${c.light}%, .50) 0%, hsla(${c.hue}, ${c.sat}%, ${c.light}%, 0) 70%)`;
+      glow.style.background = `radial-gradient(circle, hsla(${c.hue}, ${c.sat}%, ${c.light}%, .45) 0%, hsla(${c.hue}, ${c.sat}%, ${c.light}%, 0) 70%)`;
     }
 
     function updateUI() {
@@ -948,6 +982,7 @@
     function playBeep() {
       if (!beepToggle.checked) return;
       ensureAudio();
+
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       const now = audioCtx.currentTime;
@@ -969,19 +1004,18 @@
     function speak(text) {
       if (!voiceToggle.checked) return;
       if (!("speechSynthesis" in window)) return;
+
       window.speechSynthesis.cancel();
+
       const utter = new SpeechSynthesisUtterance(text);
-      utter.rate = 0.92;
+      utter.rate = 0.9;
       utter.pitch = 1;
       utter.volume = 1;
       window.speechSynthesis.speak(utter);
     }
 
-    function announcePhaseAndCount() {
+    function speakPhaseCount() {
       const current = getCurrentPhase();
-      playBeep();
-
-      if (!voiceToggle.checked) return;
 
       if (current.type === "inhale2") {
         speak("Quick inhale");
@@ -1009,18 +1043,19 @@
 
         phaseRemaining = selectedTechnique.phases[currentPhaseIndex].seconds;
         updateUI();
-        announcePhaseAndCount();
+        playBeep();
+        speakPhaseCount();
       }
     }
 
     function startSession() {
       if (isRunning) return;
-
       ensureAudio();
       isRunning = true;
       stateEl.textContent = "Running";
       updateUI();
-      announcePhaseAndCount();
+      playBeep();
+      speakPhaseCount();
 
       timer = setInterval(step, 1000);
       sessionTimer = setInterval(() => {
