@@ -1,823 +1,433 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Stress Breathing</title>
-  <style>
-    :root{
-      --bg1:#07111d;
-      --bg2:#10243a;
-      --card:rgba(17,32,51,.80);
-      --line:rgba(255,255,255,.08);
-      --text:#eef7ff;
-      --muted:#a8bfd6;
-      --blue:#7dd3fc;
-      --inhale:#60a5fa;
-      --hold:#fbbf24;
-      --exhale:#34d399;
-      --shadow:0 22px 60px rgba(0,0,0,.35);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Breathora</title>
 
-    *{box-sizing:border-box}
+<style>
+:root{
+--bg1:#06111d;
+--bg2:#0d2238;
+--card:rgba(16,30,48,.82);
+--line:rgba(255,255,255,.08);
+--text:#eef7ff;
+--muted:#9fb6cc;
+--blue:#3b82f6;
+--blue2:#60a5fa;
+--shadow:0 20px 60px rgba(0,0,0,.35);
+}
 
-    body{
-      margin:0;
-      min-height:100vh;
-      font-family:Arial, Helvetica, sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(circle at top, rgba(66,153,225,.28), transparent 30%),
-        linear-gradient(180deg,var(--bg1),var(--bg2));
-      padding:22px;
-    }
+*{box-sizing:border-box;}
 
-    .app{
-      max-width:1200px;
-      margin:0 auto;
-      display:grid;
-      grid-template-columns:360px 1fr;
-      gap:22px;
-    }
+body{
+margin:0;
+font-family:Arial,Helvetica,sans-serif;
+color:var(--text);
+background:
+radial-gradient(circle at top, rgba(59,130,246,.25), transparent 28%),
+linear-gradient(180deg,var(--bg1),var(--bg2));
+min-height:100vh;
+padding:20px;
+overflow-x:hidden;
+}
 
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:26px;
-      box-shadow:var(--shadow);
-      backdrop-filter: blur(12px);
-    }
+body:before{
+content:"";
+position:fixed;
+inset:0;
+background:
+radial-gradient(circle at 20% 30%, rgba(255,255,255,.03), transparent 18%),
+radial-gradient(circle at 80% 60%, rgba(255,255,255,.025), transparent 18%);
+animation: drift 16s linear infinite alternate;
+pointer-events:none;
+}
 
-    .sidebar{
-      padding:22px;
-    }
+@keyframes drift{
+from{transform:translateY(0px);}
+to{transform:translateY(-18px);}
+}
 
-    h1{
-      margin:0 0 8px;
-      font-size:32px;
-    }
+.app{
+max-width:1180px;
+margin:auto;
+display:grid;
+grid-template-columns:340px 1fr;
+gap:22px;
+}
 
-    .sub{
-      color:var(--muted);
-      line-height:1.45;
-      margin-bottom:20px;
-      font-size:15px;
-    }
+.card{
+background:var(--card);
+border:1px solid var(--line);
+border-radius:28px;
+box-shadow:var(--shadow);
+backdrop-filter:blur(12px);
+}
 
-    .preset-list{
-      display:grid;
-      gap:12px;
-      margin-bottom:18px;
-      max-height:540px;
-      overflow:auto;
-      padding-right:4px;
-    }
+.sidebar{
+padding:24px;
+}
 
-    .preset{
-      width:100%;
-      text-align:left;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.04);
-      color:var(--text);
-      border-radius:18px;
-      padding:15px 14px;
-      cursor:pointer;
-      transition:.18s ease;
-    }
+.brand{
+display:flex;
+align-items:center;
+gap:14px;
+margin-bottom:14px;
+}
 
-    .preset:hover{
-      transform:translateY(-1px);
-      background:rgba(255,255,255,.07);
-    }
+.logo{
+width:54px;
+height:54px;
+border-radius:50%;
+background:
+radial-gradient(circle at 30% 28%, rgba(255,255,255,.55), transparent 20%),
+linear-gradient(180deg,#7dd3fc,#2563eb);
+box-shadow:
+inset -8px -12px 18px rgba(0,0,0,.22),
+0 0 28px rgba(96,165,250,.45);
+position:relative;
+}
 
-    .preset.active{
-      border-color:rgba(125,211,252,.45);
-      background:rgba(125,211,252,.10);
-      box-shadow:0 0 0 1px rgba(125,211,252,.08) inset;
-    }
+.logo:after{
+content:"";
+position:absolute;
+bottom:-8px;
+left:50%;
+transform:translateX(-50%);
+width:12px;
+height:14px;
+background:#2563eb;
+clip-path:polygon(50% 100%,0 0,100% 0);
+}
 
-    .preset-top{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      align-items:center;
-      margin-bottom:6px;
-    }
+h1{
+margin:0;
+font-size:34px;
+}
 
-    .preset-name{
-      font-size:18px;
-      font-weight:700;
-    }
+.sub{
+color:var(--muted);
+font-size:14px;
+line-height:1.45;
+margin-bottom:20px;
+}
 
-    .preset-tag{
-      font-size:12px;
-      padding:5px 8px;
-      border-radius:999px;
-      background:rgba(255,255,255,.08);
-      color:var(--muted);
-      white-space:nowrap;
-    }
+.menu{
+display:grid;
+gap:12px;
+}
 
-    .preset-pattern{
-      color:#d7eaff;
-      font-size:14px;
-      margin-bottom:4px;
-    }
+.option{
+padding:14px;
+border-radius:18px;
+border:1px solid var(--line);
+background:rgba(255,255,255,.04);
+cursor:pointer;
+transition:.18s ease;
+}
 
-    .preset-desc{
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.35;
-    }
+.option:hover{
+transform:translateY(-1px);
+background:rgba(255,255,255,.06);
+}
 
-    .controls{
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      gap:10px;
-      margin:18px 0;
-    }
+.option strong{
+display:block;
+font-size:16px;
+margin-bottom:4px;
+}
 
-    .btn{
-      border:none;
-      border-radius:16px;
-      padding:14px 12px;
-      font-size:15px;
-      font-weight:700;
-      cursor:pointer;
-      transition:.18s ease;
-    }
+.option span{
+font-size:13px;
+color:var(--muted);
+}
 
-    .btn:hover{ transform:translateY(-1px); }
-    .start{ background:var(--blue); color:#062135; }
-    .pause{ background:#dbeafe; color:#0b2238; }
-    .reset{ background:#e2e8f0; color:#0b2238; }
+.controls{
+display:grid;
+grid-template-columns:1fr 1fr 1fr;
+gap:10px;
+margin-top:18px;
+}
 
-    .stats{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-    }
+button{
+border:none;
+padding:14px;
+border-radius:16px;
+font-weight:700;
+font-size:15px;
+cursor:pointer;
+}
 
-    .stat{
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.04);
-      border-radius:18px;
-      padding:14px;
-    }
+.start{background:#60a5fa;color:#07121e;}
+.pause{background:#dbeafe;color:#07121e;}
+.reset{background:#e2e8f0;color:#07121e;}
 
-    .stat-label{
-      color:var(--muted);
-      font-size:13px;
-      margin-bottom:7px;
-    }
+.main{
+padding:28px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:24px;
+min-height:760px;
+}
 
-    .stat-value{
-      font-size:25px;
-      font-weight:800;
-    }
+.orb-wrap{
+position:relative;
+width:360px;
+height:360px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
 
-    .main{
-      padding:26px;
-      display:flex;
-      flex-direction:column;
-      gap:22px;
-      align-items:center;
-      justify-content:center;
-      min-height:760px;
-    }
+.glow{
+position:absolute;
+width:310px;
+height:310px;
+border-radius:50%;
+filter:blur(45px);
+background:rgba(96,165,250,.35);
+animation:pulse 5s ease-in-out infinite;
+}
 
-    .hero{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:16px;
-    }
+@keyframes pulse{
+0%,100%{transform:scale(.95);opacity:.35;}
+50%{transform:scale(1.08);opacity:.55;}
+}
 
-    .balloon-wrap{
-      position:relative;
-      width:360px;
-      height:360px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
+.orb{
+width:240px;
+height:240px;
+border-radius:50%;
+background:
+radial-gradient(circle at 30% 28%, rgba(255,255,255,.52), transparent 18%),
+linear-gradient(180deg,#7dd3fc,#2563eb);
+box-shadow:
+inset -18px -26px 34px rgba(0,0,0,.24),
+0 0 38px rgba(96,165,250,.35);
+transition:all 1s ease;
+position:relative;
+}
 
-    .glow{
-      position:absolute;
-      width:310px;
-      height:310px;
-      border-radius:50%;
-      filter:blur(40px);
-      opacity:.45;
-      transition:.5s ease;
-      background:radial-gradient(circle, rgba(125,211,252,.45) 0%, rgba(125,211,252,0) 70%);
-    }
+.orb:after{
+content:"";
+position:absolute;
+bottom:-18px;
+left:50%;
+transform:translateX(-50%);
+width:22px;
+height:26px;
+background:#2563eb;
+clip-path:polygon(50% 100%,0 0,100% 0);
+}
 
-    .balloon{
-      position:relative;
-      width:240px;
-      height:240px;
-      border-radius:50%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      transition:transform .8s ease, box-shadow .5s ease, background .35s linear;
-      box-shadow:
-        inset -16px -24px 45px rgba(0,0,0,.24),
-        inset 14px 16px 28px rgba(255,255,255,.12),
-        0 0 45px rgba(125,211,252,.14);
-      border:1px solid rgba(255,255,255,.12);
-      overflow:hidden;
-    }
+.center{
+position:absolute;
+width:150px;
+height:150px;
+border-radius:50%;
+background:rgba(6,17,29,.68);
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+border:1px solid rgba(255,255,255,.08);
+backdrop-filter:blur(6px);
+}
 
-    .balloon:before{
-      content:"";
-      position:absolute;
-      inset:0;
-      border-radius:50%;
-      background:
-        radial-gradient(circle at 30% 25%, rgba(255,255,255,.48) 0%, rgba(255,255,255,.16) 18%, transparent 34%),
-        radial-gradient(circle at 35% 35%, rgba(255,255,255,.10), transparent 58%);
-      pointer-events:none;
-    }
+.phase{
+font-size:15px;
+letter-spacing:2px;
+margin-bottom:8px;
+color:#d9ebff;
+font-weight:700;
+}
 
-    .balloon:after{
-      content:"";
-      position:absolute;
-      bottom:-18px;
-      width:22px;
-      height:28px;
-      background:rgba(255,255,255,.10);
-      clip-path:polygon(50% 100%, 0 0, 100% 0);
-      filter:drop-shadow(0 4px 4px rgba(0,0,0,.18));
-    }
+.count{
+font-size:62px;
+font-weight:800;
+line-height:1;
+}
 
-    .balloon-center{
-      position:relative;
-      z-index:2;
-      width:150px;
-      height:150px;
-      border-radius:50%;
-      background:rgba(7,17,31,.55);
-      border:1px solid rgba(255,255,255,.10);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      backdrop-filter:blur(6px);
-    }
+.prompt{
+margin-top:8px;
+font-size:15px;
+font-weight:700;
+}
 
-    .phase{
-      font-size:16px;
-      color:#dcecff;
-      margin-bottom:8px;
-      text-transform:uppercase;
-      letter-spacing:2px;
-      font-weight:700;
-    }
+.footer{
+width:100%;
+max-width:720px;
+display:grid;
+gap:16px;
+}
 
-    .count{
-      font-size:62px;
-      line-height:1;
-      font-weight:800;
-      margin-bottom:8px;
-    }
+.support{
+padding:18px;
+border-radius:22px;
+border:1px solid var(--line);
+background:rgba(255,255,255,.04);
+text-align:center;
+}
 
-    .prompt{
-      font-size:16px;
-      font-weight:700;
-      color:#f4fbff;
-    }
+.support h3{
+margin:0 0 8px;
+font-size:22px;
+}
 
-    .progress-wrap{
-      width:100%;
-      max-width:720px;
-    }
+.support p{
+margin:0 0 14px;
+color:var(--muted);
+font-size:14px;
+}
 
-    .bar-label{
-      display:flex;
-      justify-content:space-between;
-      margin-bottom:8px;
-      color:var(--muted);
-      font-size:14px;
-    }
+.support a{
+display:inline-block;
+padding:14px 22px;
+border-radius:16px;
+background:#3b82f6;
+color:white;
+text-decoration:none;
+font-weight:800;
+}
 
-    .bar{
-      width:100%;
-      height:16px;
-      background:rgba(255,255,255,.08);
-      border-radius:999px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.06);
-    }
+.small{
+font-size:13px;
+color:var(--muted);
+text-align:center;
+line-height:1.45;
+}
 
-    .bar-fill{
-      height:100%;
-      width:0%;
-      background:linear-gradient(90deg, #60a5fa, #7dd3fc);
-      border-radius:999px;
-      transition:width .35s linear;
-    }
-
-    .mini-grid{
-      width:100%;
-      display:grid;
-      grid-template-columns:repeat(3, 1fr);
-      gap:18px;
-    }
-
-    .mini{
-      padding:18px 16px;
-      text-align:center;
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.06);
-      border-radius:22px;
-    }
-
-    .mini h3{
-      margin:0 0 12px;
-      font-size:18px;
-    }
-
-    .mini-ring{
-      width:120px;
-      height:120px;
-      margin:0 auto 10px;
-      border-radius:50%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      transition:.35s ease;
-      background:conic-gradient(rgba(255,255,255,.12) 0deg, rgba(255,255,255,.08) 0deg);
-    }
-
-    .mini-center{
-      width:84px;
-      height:84px;
-      border-radius:50%;
-      background:#091423;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border:1px solid rgba(255,255,255,.08);
-      font-weight:800;
-      font-size:22px;
-    }
-
-    .mini small{
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    .footer-note{
-      color:var(--muted);
-      text-align:center;
-      font-size:14px;
-      line-height:1.5;
-    }
-
-    @media (max-width: 900px){
-      .app{
-        grid-template-columns:1fr;
-      }
-      .main{
-        min-height:auto;
-      }
-      .balloon-wrap{
-        width:300px;
-        height:300px;
-      }
-      .balloon{
-        width:210px;
-        height:210px;
-      }
-      .balloon-center{
-        width:135px;
-        height:135px;
-      }
-      .count{
-        font-size:50px;
-      }
-      .mini-grid{
-        grid-template-columns:1fr;
-      }
-    }
-  </style>
+@media(max-width:900px){
+.app{grid-template-columns:1fr;}
+.main{min-height:auto;}
+.orb-wrap{width:300px;height:300px;}
+.orb{width:210px;height:210px;}
+.center{width:136px;height:136px;}
+.count{font-size:50px;}
+}
+</style>
 </head>
+
 <body>
-  <div class="app">
-    <div class="card sidebar">
-      <h1>Stress Breathing</h1>
-      <div class="sub">
-        Pick a technique and follow the balloon. It fills on inhale, holds steady, and shrinks on exhale.
-      </div>
 
-      <div class="preset-list" id="presetList"></div>
+<div class="app">
 
-      <div class="controls">
-        <button class="btn start" id="startBtn">Start</button>
-        <button class="btn pause" id="pauseBtn">Pause</button>
-        <button class="btn reset" id="resetBtn">Reset</button>
-      </div>
+<div class="card sidebar">
 
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-label">Technique</div>
-          <div class="stat-value" id="techniqueName">Box</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Cycles</div>
-          <div class="stat-value" id="cyclesCompleted">0</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Session</div>
-          <div class="stat-value" id="sessionTime">0:00</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">State</div>
-          <div class="stat-value" id="runState">Ready</div>
-        </div>
-      </div>
-    </div>
+<div class="brand">
+<div class="logo"></div>
+<div>
+<h1>Breathora</h1>
+<div class="sub">Guided breathing for stress relief, calm, focus & wellness.</div>
+</div>
+</div>
 
-    <div class="card main">
-      <div class="hero">
-        <div class="balloon-wrap">
-          <div class="glow" id="glow"></div>
-          <div class="balloon" id="balloon">
-            <div class="balloon-center">
-              <div class="phase" id="phaseLabel">READY</div>
-              <div class="count" id="countLabel">0</div>
-              <div class="prompt" id="promptLabel">Press Start</div>
-            </div>
-          </div>
-        </div>
-      </div>
+<div class="menu">
+<div class="option"><strong>Box Breathing</strong><span>Calm & focus • 4x4x4x4</span></div>
+<div class="option"><strong>4-6 Relax</strong><span>De-stress • 4 in / 6 out</span></div>
+<div class="option"><strong>Deep Calm</strong><span>Sleep mode • 4-7-8</span></div>
+<div class="option"><strong>Physiological Sigh</strong><span>Fast reset / vagus nerve</span></div>
+</div>
 
-      <div class="progress-wrap">
-        <div class="bar-label">
-          <span>Cycle Progress</span>
-          <span id="cyclePercent">0%</span>
-        </div>
-        <div class="bar">
-          <div class="bar-fill" id="cycleBar"></div>
-        </div>
-      </div>
+<div class="controls">
+<button class="start">Start</button>
+<button class="pause">Pause</button>
+<button class="reset">Reset</button>
+</div>
 
-      <div class="mini-grid">
-        <div class="mini">
-          <h3>Inhale</h3>
-          <div class="mini-ring" id="inhaleRing">
-            <div class="mini-center" id="inhaleValue">0</div>
-          </div>
-          <small id="inhaleText">Ready</small>
-        </div>
+</div>
 
-        <div class="mini">
-          <h3>Hold</h3>
-          <div class="mini-ring" id="holdRing">
-            <div class="mini-center" id="holdValue">0</div>
-          </div>
-          <small id="holdText">Ready</small>
-        </div>
+<div class="card main">
 
-        <div class="mini">
-          <h3>Exhale</h3>
-          <div class="mini-ring" id="exhaleRing">
-            <div class="mini-center" id="exhaleValue">0</div>
-          </div>
-          <small id="exhaleText">Ready</small>
-        </div>
-      </div>
+<div class="orb-wrap">
+<div class="glow"></div>
 
-      <div class="footer-note" id="techniqueDesc">
-        Good for steady calm breathing.
-      </div>
-    </div>
-  </div>
+<div class="orb" id="orb">
+<div class="center">
+<div class="phase" id="phase">READY</div>
+<div class="count" id="count">0</div>
+<div class="prompt" id="prompt">Press Start</div>
+</div>
+</div>
+</div>
 
-  <script>
-    const techniques = [
-      {
-        id: "box",
-        name: "Box Breathing",
-        tag: "Calming",
-        pattern: "4 in • 4 hold • 4 out • 4 hold",
-        description: "Steady, balanced breathing for control and calm.",
-        phases: [
-          { name: "Inhale", seconds: 4, type: "inhale" },
-          { name: "Hold", seconds: 4, type: "hold" },
-          { name: "Exhale", seconds: 4, type: "exhale" },
-          { name: "Hold", seconds: 4, type: "hold" }
-        ]
-      },
-      {
-        id: "relax",
-        name: "4-6 Relax",
-        tag: "De-Stress",
-        pattern: "4 in • 6 out",
-        description: "Longer exhale helps downshift tension.",
-        phases: [
-          { name: "Inhale", seconds: 4, type: "inhale" },
-          { name: "Exhale", seconds: 6, type: "exhale" }
-        ]
-      },
-      {
-        id: "focus",
-        name: "Focus Reset",
-        tag: "Focus",
-        pattern: "4 in • 2 hold • 4 out",
-        description: "Simple reset when your head feels busy.",
-        phases: [
-          { name: "Inhale", seconds: 4, type: "inhale" },
-          { name: "Hold", seconds: 2, type: "hold" },
-          { name: "Exhale", seconds: 4, type: "exhale" }
-        ]
-      },
-      {
-        id: "deep",
-        name: "Deep Calm",
-        tag: "Sleepy / Calm",
-        pattern: "4 in • 7 hold • 8 out",
-        description: "Classic slow-breath pattern for deeper relaxation.",
-        phases: [
-          { name: "Inhale", seconds: 4, type: "inhale" },
-          { name: "Hold", seconds: 7, type: "hold" },
-          { name: "Exhale", seconds: 8, type: "exhale" }
-        ]
-      },
-      {
-        id: "physiological",
-        name: "Physiological Sigh",
-        tag: "Vagus Nerve",
-        pattern: "Big inhale • quick top-up • long exhale",
-        description: "Great when you feel wound up or stuck in stress mode.",
-        phases: [
-          { name: "Inhale", seconds: 3, type: "inhale" },
-          { name: "Top-Up", seconds: 1, type: "inhale2" },
-          { name: "Exhale", seconds: 6, type: "exhale" }
-        ]
-      },
-      {
-        id: "energize",
-        name: "Wake Up",
-        tag: "Energy",
-        pattern: "6 in • 2 hold • 4 out",
-        description: "A little more inhale to wake you up without rushing.",
-        phases: [
-          { name: "Inhale", seconds: 6, type: "inhale" },
-          { name: "Hold", seconds: 2, type: "hold" },
-          { name: "Exhale", seconds: 4, type: "exhale" }
-        ]
-      }
-    ];
+<div class="footer">
 
-    let selectedTechnique = techniques[0];
-    let currentPhaseIndex = 0;
-    let phaseRemaining = selectedTechnique.phases[0].seconds;
-    let timer = null;
-    let sessionTimer = null;
-    let sessionSeconds = 0;
-    let cyclesCompleted = 0;
-    let isRunning = false;
+<div class="support">
+<h3>Support Breathora</h3>
+<p>If this app helps calm your nervous system, support future updates.</p>
+<a href="https://venmo.com/Breathora" target="_blank">Donate via Venmo</a>
+</div>
 
-    const presetList = document.getElementById("presetList");
-    const balloon = document.getElementById("balloon");
-    const glow = document.getElementById("glow");
-    const phaseLabel = document.getElementById("phaseLabel");
-    const countLabel = document.getElementById("countLabel");
-    const promptLabel = document.getElementById("promptLabel");
-    const cycleBar = document.getElementById("cycleBar");
-    const cyclePercent = document.getElementById("cyclePercent");
-    const techniqueName = document.getElementById("techniqueName");
-    const techniqueDesc = document.getElementById("techniqueDesc");
-    const cyclesEl = document.getElementById("cyclesCompleted");
-    const sessionEl = document.getElementById("sessionTime");
-    const stateEl = document.getElementById("runState");
+<div class="small">
+Breathora • Breathe. Reset. Recover.<br>
+Free guided breathing tool.
+</div>
 
-    function renderTechniques() {
-      presetList.innerHTML = "";
-      techniques.forEach(t => {
-        const btn = document.createElement("button");
-        btn.className = "preset" + (t.id === selectedTechnique.id ? " active" : "");
-        btn.innerHTML = `
-          <div class="preset-top">
-            <div class="preset-name">${t.name}</div>
-            <div class="preset-tag">${t.tag}</div>
-          </div>
-          <div class="preset-pattern">${t.pattern}</div>
-          <div class="preset-desc">${t.description}</div>
-        `;
-        btn.onclick = () => selectTechnique(t.id);
-        presetList.appendChild(btn);
-      });
-    }
+</div>
 
-    function selectTechnique(id) {
-      const found = techniques.find(t => t.id === id);
-      if (!found) return;
-      selectedTechnique = found;
-      resetSession(false);
-      renderTechniques();
-      updateUI();
-    }
+</div>
+</div>
 
-    function formatTime(seconds) {
-      const m = Math.floor(seconds / 60);
-      const s = seconds % 60;
-      return `${m}:${String(s).padStart(2, "0")}`;
-    }
+<script>
+let running=false;
+let phase=0;
+let count=4;
+let timer;
 
-    function getCurrentPhase() {
-      return selectedTechnique.phases[currentPhaseIndex];
-    }
+const phases=[
+{name:"INHALE",secs:4,color1:"#60a5fa",color2:"#2563eb"},
+{name:"HOLD",secs:4,color1:"#facc15",color2:"#f59e0b"},
+{name:"EXHALE",secs:4,color1:"#22c55e",color2:"#ef4444"},
+{name:"HOLD",secs:4,color1:"#facc15",color2:"#f59e0b"}
+];
 
-    function getCycleSeconds() {
-      return selectedTechnique.phases.reduce((sum, p) => sum + p.seconds, 0);
-    }
+function updateUI(){
+document.getElementById("phase").textContent=phases[phase].name;
+document.getElementById("count").textContent=count;
+document.getElementById("prompt").textContent=phases[phase].name;
 
-    function getElapsedThisCycle() {
-      let elapsed = 0;
-      for (let i = 0; i < currentPhaseIndex; i++) {
-        elapsed += selectedTechnique.phases[i].seconds;
-      }
-      elapsed += getCurrentPhase().seconds - phaseRemaining;
-      return elapsed;
-    }
+const p=phases[phase];
+document.getElementById("orb").style.background=
+`radial-gradient(circle at 30% 28%, rgba(255,255,255,.52), transparent 18%), linear-gradient(180deg, ${p.color1}, ${p.color2})`;
+}
 
-    function setRing(id, percent, color, value, label) {
-      const ring = document.getElementById(id + "Ring");
-      const val = document.getElementById(id + "Value");
-      const text = document.getElementById(id + "Text");
-      ring.style.background = `conic-gradient(${color} ${percent * 3.6}deg, rgba(255,255,255,.10) 0deg)`;
-      val.textContent = value;
-      text.textContent = label;
-    }
+function tick(){
+count--;
+if(count<=0){
+phase=(phase+1)%phases.length;
+count=phases[phase].secs;
+}
+updateUI();
+}
 
-    function updateMiniRings() {
-      const current = getCurrentPhase();
+document.querySelector(".start").onclick=()=>{
+if(running)return;
+running=true;
+updateUI();
+timer=setInterval(tick,1000);
+};
 
-      const inhalePhase = selectedTechnique.phases.find(p => p.type === "inhale" || p.type === "inhale2");
-      const holdPhase = selectedTechnique.phases.find(p => p.type === "hold");
-      const exhalePhase = selectedTechnique.phases.find(p => p.type === "exhale");
+document.querySelector(".pause").onclick=()=>{
+running=false;
+clearInterval(timer);
+};
 
-      let inhalePercent = 0;
-      let holdPercent = 0;
-      let exhalePercent = 0;
+document.querySelector(".reset").onclick=()=>{
+running=false;
+clearInterval(timer);
+phase=0;
+count=4;
+updateUI();
+};
 
-      if (current.type === "inhale" || current.type === "inhale2") {
-        inhalePercent = ((current.seconds - phaseRemaining) / current.seconds) * 100;
-      } else if (currentPhaseIndex > selectedTechnique.phases.findIndex(p => p.type === "inhale" || p.type === "inhale2")) {
-        inhalePercent = 100;
-      }
+updateUI();
+</script>
 
-      if (holdPhase) {
-        if (current.type === "hold") {
-          holdPercent = ((current.seconds - phaseRemaining) / current.seconds) * 100;
-        } else if (currentPhaseIndex > selectedTechnique.phases.findIndex(p => p.type === "hold")) {
-          holdPercent = 100;
-        }
-      }
-
-      if (current.type === "exhale") {
-        exhalePercent = ((current.seconds - phaseRemaining) / current.seconds) * 100;
-      }
-
-      setRing("inhale", inhalePercent, "#60a5fa", inhalePhase ? inhalePhase.seconds : 0, current.type === "inhale" || current.type === "inhale2" ? `${phaseRemaining}s left` : inhalePhase ? `${inhalePhase.seconds}s` : "N/A");
-      setRing("hold", holdPercent, "#fbbf24", holdPhase ? holdPhase.seconds : 0, holdPhase ? (current.type === "hold" ? `${phaseRemaining}s left` : `${holdPhase.seconds}s`) : "No hold");
-      setRing("exhale", exhalePercent, "#34d399", exhalePhase ? exhalePhase.seconds : 0, current.type === "exhale" ? `${phaseRemaining}s left` : exhalePhase ? `${exhalePhase.seconds}s` : "N/A");
-    }
-
-    function updateBalloonVisual() {
-      const current = getCurrentPhase();
-      const progress = (current.seconds - phaseRemaining) / current.seconds;
-
-      let scale = 1;
-      let hue = 210;
-      let sat = 78;
-      let light = 48;
-      let glowOpacity = 0.45;
-
-      if (current.type === "inhale") {
-        scale = 0.92 + (progress * 0.28);
-        hue = 205 + (progress * 15);
-        sat = 72 + (progress * 12);
-        light = 42 + (progress * 14);
-        glowOpacity = 0.30 + (progress * 0.35);
-      } else if (current.type === "inhale2") {
-        scale = 1.16 + (progress * 0.08);
-        hue = 218 + (progress * 8);
-        sat = 84 + (progress * 8);
-        light = 56 + (progress * 8);
-        glowOpacity = 0.58 + (progress * 0.15);
-      } else if (current.type === "hold") {
-        scale = 1.18;
-        hue = 42;
-        sat = 92;
-        light = 56;
-        glowOpacity = 0.50;
-      } else if (current.type === "exhale") {
-        scale = 1.18 - (progress * 0.30);
-        hue = 155;
-        sat = 68;
-        light = 45;
-        glowOpacity = 0.42 - (progress * 0.15);
-      }
-
-      balloon.style.transform = `scale(${scale})`;
-      balloon.style.background = `
-        radial-gradient(circle at 50% ${100 - (progress * 70)}%, rgba(255,255,255,.10), transparent 55%),
-        linear-gradient(180deg, hsla(${hue}, ${sat}%, ${light + 8}%, .95), hsla(${hue}, ${sat}%, ${light - 8}%, .98))
-      `;
-      balloon.style.boxShadow = `
-        inset -16px -24px 45px rgba(0,0,0,.24),
-        inset 14px 16px 28px rgba(255,255,255,.12),
-        0 0 55px rgba(125,211,252,${glowOpacity})
-      `;
-      glow.style.opacity = glowOpacity;
-    }
-
-    function updateUI() {
-      const current = getCurrentPhase();
-
-      phaseLabel.textContent = current.name.toUpperCase();
-      countLabel.textContent = phaseRemaining;
-      promptLabel.textContent = current.type === "inhale2" ? "Quick top-up" : current.name;
-      techniqueName.textContent = selectedTechnique.name;
-      techniqueDesc.textContent = selectedTechnique.description;
-      cyclesEl.textContent = cyclesCompleted;
-      sessionEl.textContent = formatTime(sessionSeconds);
-      stateEl.textContent = isRunning ? "Running" : "Ready";
-
-      const cycleProgress = Math.round((getElapsedThisCycle() / getCycleSeconds()) * 100);
-      cycleBar.style.width = cycleProgress + "%";
-      cyclePercent.textContent = cycleProgress + "%";
-
-      updateBalloonVisual();
-      updateMiniRings();
-    }
-
-    function step() {
-      if (phaseRemaining > 1) {
-        phaseRemaining -= 1;
-      } else {
-        currentPhaseIndex += 1;
-
-        if (currentPhaseIndex >= selectedTechnique.phases.length) {
-          currentPhaseIndex = 0;
-          cyclesCompleted += 1;
-        }
-
-        phaseRemaining = selectedTechnique.phases[currentPhaseIndex].seconds;
-      }
-
-      updateUI();
-    }
-
-    function startSession() {
-      if (isRunning) return;
-      isRunning = true;
-      stateEl.textContent = "Running";
-
-      timer = setInterval(step, 1000);
-      sessionTimer = setInterval(() => {
-        sessionSeconds += 1;
-        sessionEl.textContent = formatTime(sessionSeconds);
-      }, 1000);
-
-      updateUI();
-    }
-
-    function pauseSession() {
-      isRunning = false;
-      clearInterval(timer);
-      clearInterval(sessionTimer);
-      stateEl.textContent = "Paused";
-    }
-
-    function resetSession(updateTechnique = true) {
-      clearInterval(timer);
-      clearInterval(sessionTimer);
-      isRunning = false;
-      currentPhaseIndex = 0;
-      phaseRemaining = selectedTechnique.phases[0].seconds;
-      sessionSeconds = 0;
-      cyclesCompleted = 0;
-      if (updateTechnique) {
-        techniqueName.textContent = selectedTechnique.name;
-      }
-      updateUI();
-      stateEl.textContent = "Ready";
-    }
-
-    document.getElementById("startBtn").onclick = startSession;
-    document.getElementById("pauseBtn").onclick = pauseSession;
-    document.getElementById("resetBtn").onclick = () => resetSession();
-
-    renderTechniques();
-    updateUI();
-  </script>
 </body>
 </html>
