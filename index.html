@@ -24,44 +24,99 @@
       font-family:Arial, Helvetica, sans-serif;
       color:var(--text);
       background:
-        radial-gradient(circle at top, rgba(66,153,225,.18), transparent 28%),
+        radial-gradient(circle at top, rgba(90,160,200,.16), transparent 28%),
         linear-gradient(180deg,var(--bg1),var(--bg2));
       padding:20px;
       overflow-x:hidden;
     }
 
-    body::before,
-    body::after{
-      content:"";
+    .zen-bg{
       position:fixed;
-      inset:-10%;
+      inset:0;
       pointer-events:none;
       z-index:0;
+      overflow:hidden;
     }
 
-    body::before{
+    .zen-orb{
+      position:absolute;
+      border-radius:50%;
+      filter:blur(55px);
+      opacity:.18;
+      animation-timing-function:ease-in-out;
+      animation-iteration-count:infinite;
+      animation-direction:alternate;
+    }
+
+    .zen1{
+      width:340px;
+      height:340px;
+      left:8%;
+      top:10%;
+      background:rgba(96,165,250,.28);
+      animation:float1 18s infinite;
+    }
+
+    .zen2{
+      width:420px;
+      height:420px;
+      right:8%;
+      top:18%;
+      background:rgba(52,211,153,.18);
+      animation:float2 24s infinite;
+    }
+
+    .zen3{
+      width:360px;
+      height:360px;
+      left:18%;
+      bottom:8%;
+      background:rgba(251,191,36,.12);
+      animation:float3 21s infinite;
+    }
+
+    .zen4{
+      width:300px;
+      height:300px;
+      right:20%;
+      bottom:12%;
+      background:rgba(168,85,247,.15);
+      animation:float4 26s infinite;
+    }
+
+    @keyframes float1{
+      from{transform:translate(0,0) scale(1);}
+      to{transform:translate(35px,-22px) scale(1.08);}
+    }
+
+    @keyframes float2{
+      from{transform:translate(0,0) scale(1);}
+      to{transform:translate(-28px,24px) scale(1.06);}
+    }
+
+    @keyframes float3{
+      from{transform:translate(0,0) scale(1);}
+      to{transform:translate(20px,-30px) scale(1.07);}
+    }
+
+    @keyframes float4{
+      from{transform:translate(0,0) scale(1);}
+      to{transform:translate(-18px,20px) scale(1.05);}
+    }
+
+    .wave-lines{
+      position:absolute;
+      inset:0;
+      opacity:.08;
       background:
-        radial-gradient(circle at 20% 30%, rgba(255,80,80,.08), transparent 18%),
-        radial-gradient(circle at 75% 25%, rgba(96,165,250,.10), transparent 22%),
-        radial-gradient(circle at 70% 75%, rgba(251,191,36,.06), transparent 18%);
-      animation: driftA 18s ease-in-out infinite alternate;
+        radial-gradient(ellipse at center, transparent 58%, rgba(255,255,255,.18) 59%, transparent 60%) center/700px 700px no-repeat,
+        radial-gradient(ellipse at center, transparent 66%, rgba(255,255,255,.12) 67%, transparent 68%) center/900px 900px no-repeat;
+      animation:breathWaves 14s ease-in-out infinite;
     }
 
-    body::after{
-      background:
-        radial-gradient(circle at 30% 70%, rgba(139,92,246,.07), transparent 20%),
-        radial-gradient(circle at 80% 60%, rgba(255,255,255,.03), transparent 12%);
-      animation: driftB 24s ease-in-out infinite alternate;
-    }
-
-    @keyframes driftA{
-      from{transform:translateY(0) translateX(0) scale(1);}
-      to{transform:translateY(-12px) translateX(8px) scale(1.03);}
-    }
-
-    @keyframes driftB{
-      from{transform:translateY(0) translateX(0) scale(1);}
-      to{transform:translateY(10px) translateX(-10px) scale(1.02);}
+    @keyframes breathWaves{
+      0%,100%{transform:scale(.98); opacity:.05;}
+      50%{transform:scale(1.04); opacity:.10;}
     }
 
     .app{
@@ -508,13 +563,21 @@
   </style>
 </head>
 <body>
+  <div class="zen-bg">
+    <div class="zen-orb zen1"></div>
+    <div class="zen-orb zen2"></div>
+    <div class="zen-orb zen3"></div>
+    <div class="zen-orb zen4"></div>
+    <div class="wave-lines"></div>
+  </div>
+
   <div class="app">
     <div class="card sidebar">
       <div class="brand">
         <div class="logo"></div>
         <div>
           <h1>Breathora</h1>
-          <div class="sub">Guided breathing for stress relief, calm, focus, and better downshifting.</div>
+          <div class="sub">Guided breathing to reduce stress, improve focus, and help you relax.</div>
         </div>
       </div>
 
@@ -528,16 +591,12 @@
 
       <div class="audio-box">
         <div class="audio-row">
-          <span>Tone cues</span>
-          <input type="checkbox" id="toneToggle" checked />
+          <span>Voice guidance</span>
+          <input type="checkbox" id="voiceToggle" checked />
         </div>
         <div class="audio-row">
-          <span>Voice cues</span>
-          <input type="checkbox" id="voiceToggle" />
-        </div>
-        <div class="audio-row">
-          <span>Count out loud</span>
-          <input type="checkbox" id="countToggle" />
+          <span>Beep on phase change</span>
+          <input type="checkbox" id="beepToggle" checked />
         </div>
       </div>
 
@@ -720,9 +779,8 @@
     const cyclesEl = document.getElementById("cyclesCompleted");
     const sessionEl = document.getElementById("sessionTime");
     const stateEl = document.getElementById("runState");
-    const toneToggle = document.getElementById("toneToggle");
     const voiceToggle = document.getElementById("voiceToggle");
-    const countToggle = document.getElementById("countToggle");
+    const beepToggle = document.getElementById("beepToggle");
 
     function renderTechniques() {
       presetList.innerHTML = "";
@@ -814,64 +872,29 @@
         exhalePercent = ((current.seconds - phaseRemaining) / current.seconds) * 100;
       }
 
-      setRing(
-        "inhale",
-        inhalePercent,
-        "#60a5fa",
-        inhalePhase ? inhalePhase.seconds : 0,
-        (current.type === "inhale" || current.type === "inhale2") ? `${phaseRemaining}s left` : inhalePhase ? `${inhalePhase.seconds}s` : "N/A"
-      );
-
-      setRing(
-        "hold",
-        holdPercent,
-        "#f59e0b",
-        holdPhase ? holdPhase.seconds : 0,
-        holdPhase ? (current.type === "hold" ? `${phaseRemaining}s left` : `${holdPhase.seconds}s`) : "No hold"
-      );
-
-      setRing(
-        "exhale",
-        exhalePercent,
-        "#ef4444",
-        exhalePhase ? exhalePhase.seconds : 0,
-        current.type === "exhale" ? `${phaseRemaining}s left` : exhalePhase ? `${exhalePhase.seconds}s` : "N/A"
-      );
+      setRing("inhale", inhalePercent, "#60a5fa", inhalePhase ? inhalePhase.seconds : 0, (current.type === "inhale" || current.type === "inhale2") ? `${phaseRemaining}s left` : inhalePhase ? `${inhalePhase.seconds}s` : "N/A");
+      setRing("hold", holdPercent, "#f59e0b", holdPhase ? holdPhase.seconds : 0, holdPhase ? (current.type === "hold" ? `${phaseRemaining}s left` : `${holdPhase.seconds}s`) : "No hold");
+      setRing("exhale", exhalePercent, "#ef4444", exhalePhase ? exhalePhase.seconds : 0, current.type === "exhale" ? `${phaseRemaining}s left` : exhalePhase ? `${exhalePhase.seconds}s` : "N/A");
     }
 
     function getOrbStyle(type, progress) {
       if (type === "inhale") {
         const hue = 0 + (progress * 220);
-        const sat = 82;
-        const light = 52;
-        const scale = 0.90 + (progress * 0.30);
-        return { hue, sat, light, scale, glowAlpha: 0.28 + (progress * 0.28) };
+        return { hue, sat: 82, light: 52, scale: 0.90 + (progress * 0.30), glowAlpha: 0.28 + (progress * 0.28) };
       }
-
       if (type === "inhale2") {
-        const hue = 220;
-        const sat = 88;
-        const light = 58;
-        const scale = 1.18 + (progress * 0.05);
-        return { hue, sat, light, scale, glowAlpha: 0.55 };
+        return { hue: 220, sat: 88, light: 58, scale: 1.18 + (progress * 0.05), glowAlpha: 0.55 };
       }
-
       if (type === "hold") {
         const hue = 220 - (progress * 220);
-        const sat = 84;
-        const light = 54;
-        const scale = 1.18;
-        return { hue, sat, light, scale, glowAlpha: 0.42 };
+        return { hue, sat: 84, light: 54, scale: 1.18, glowAlpha: 0.42 };
       }
-
       if (type === "exhale") {
         const hue = 15 - (progress * 15);
         const sat = 78 - (progress * 16);
         const light = 50 - (progress * 18);
-        const scale = 1.16 - (progress * 0.30);
-        return { hue, sat, light, scale, glowAlpha: 0.34 - (progress * 0.16) };
+        return { hue, sat, light, scale: 1.16 - (progress * 0.30), glowAlpha: 0.34 - (progress * 0.16) };
       }
-
       return { hue: 210, sat: 80, light: 50, scale: 1, glowAlpha: 0.35 };
     }
 
@@ -896,7 +919,6 @@
 
     function updateUI() {
       const current = getCurrentPhase();
-
       phaseLabel.textContent = current.name.toUpperCase();
       countLabel.textContent = phaseRemaining;
       promptLabel.textContent = current.type === "inhale2" ? "Quick top-up" : current.name;
@@ -923,31 +945,25 @@
       }
     }
 
-    function playTone(type) {
-      if (!toneToggle.checked) return;
+    function playBeep() {
+      if (!beepToggle.checked) return;
       ensureAudio();
-
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       const now = audioCtx.currentTime;
 
       osc.type = "sine";
-
-      if (type === "inhale") osc.frequency.value = 540;
-      else if (type === "inhale2") osc.frequency.value = 700;
-      else if (type === "hold") osc.frequency.value = 430;
-      else if (type === "exhale") osc.frequency.value = 320;
-      else osc.frequency.value = 500;
+      osc.frequency.value = 520;
 
       gain.gain.value = 0.0001;
       osc.connect(gain);
       gain.connect(audioCtx.destination);
 
-      gain.gain.linearRampToValueAtTime(0.07, now + 0.02);
-      gain.gain.linearRampToValueAtTime(0.0001, now + 0.18);
+      gain.gain.linearRampToValueAtTime(0.08, now + 0.01);
+      gain.gain.linearRampToValueAtTime(0.0001, now + 0.12);
 
       osc.start(now);
-      osc.stop(now + 0.22);
+      osc.stop(now + 0.14);
     }
 
     function speak(text) {
@@ -961,32 +977,28 @@
       window.speechSynthesis.speak(utter);
     }
 
-    function announcePhase() {
+    function announcePhaseAndCount() {
       const current = getCurrentPhase();
-      playTone(current.type);
+      playBeep();
 
-      if (voiceToggle.checked) {
-        if (current.type === "inhale2") speak("Quick inhale");
-        else speak(current.name);
+      if (!voiceToggle.checked) return;
+
+      if (current.type === "inhale2") {
+        speak("Quick inhale");
+        return;
       }
-    }
 
-    function announceCount() {
-      if (!countToggle.checked || !voiceToggle.checked) return;
-
-      const current = getCurrentPhase();
-      if (current.type === "inhale2") return;
-      if (phaseRemaining <= 1) return;
-
-      const spokenCount = (current.seconds - phaseRemaining) + 2;
-      speak(String(spokenCount));
+      const parts = [current.name];
+      for (let i = 2; i <= current.seconds; i++) {
+        parts.push(String(i));
+      }
+      speak(parts.join(", "));
     }
 
     function step() {
       if (phaseRemaining > 1) {
         phaseRemaining -= 1;
         updateUI();
-        announceCount();
       } else {
         currentPhaseIndex += 1;
 
@@ -997,7 +1009,7 @@
 
         phaseRemaining = selectedTechnique.phases[currentPhaseIndex].seconds;
         updateUI();
-        announcePhase();
+        announcePhaseAndCount();
       }
     }
 
@@ -1008,7 +1020,7 @@
       isRunning = true;
       stateEl.textContent = "Running";
       updateUI();
-      announcePhase();
+      announcePhaseAndCount();
 
       timer = setInterval(step, 1000);
       sessionTimer = setInterval(() => {
