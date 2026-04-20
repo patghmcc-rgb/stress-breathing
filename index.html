@@ -1,433 +1,1052 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Breathora</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Breathora</title>
+  <style>
+    :root{
+      --bg1:#07111d;
+      --bg2:#10243a;
+      --card:rgba(17,32,51,.82);
+      --line:rgba(255,255,255,.08);
+      --text:#eef7ff;
+      --muted:#a8bfd6;
+      --shadow:0 22px 60px rgba(0,0,0,.35);
+      --btn:#7dd3fc;
+    }
 
-<style>
-:root{
---bg1:#06111d;
---bg2:#0d2238;
---card:rgba(16,30,48,.82);
---line:rgba(255,255,255,.08);
---text:#eef7ff;
---muted:#9fb6cc;
---blue:#3b82f6;
---blue2:#60a5fa;
---shadow:0 20px 60px rgba(0,0,0,.35);
-}
+    *{box-sizing:border-box}
 
-*{box-sizing:border-box;}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Arial, Helvetica, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top, rgba(66,153,225,.18), transparent 28%),
+        linear-gradient(180deg,var(--bg1),var(--bg2));
+      padding:20px;
+      overflow-x:hidden;
+    }
 
-body{
-margin:0;
-font-family:Arial,Helvetica,sans-serif;
-color:var(--text);
-background:
-radial-gradient(circle at top, rgba(59,130,246,.25), transparent 28%),
-linear-gradient(180deg,var(--bg1),var(--bg2));
-min-height:100vh;
-padding:20px;
-overflow-x:hidden;
-}
+    body::before,
+    body::after{
+      content:"";
+      position:fixed;
+      inset:-10%;
+      pointer-events:none;
+      z-index:0;
+    }
 
-body:before{
-content:"";
-position:fixed;
-inset:0;
-background:
-radial-gradient(circle at 20% 30%, rgba(255,255,255,.03), transparent 18%),
-radial-gradient(circle at 80% 60%, rgba(255,255,255,.025), transparent 18%);
-animation: drift 16s linear infinite alternate;
-pointer-events:none;
-}
+    body::before{
+      background:
+        radial-gradient(circle at 20% 30%, rgba(255,80,80,.08), transparent 18%),
+        radial-gradient(circle at 75% 25%, rgba(96,165,250,.10), transparent 22%),
+        radial-gradient(circle at 70% 75%, rgba(251,191,36,.06), transparent 18%);
+      animation: driftA 18s ease-in-out infinite alternate;
+    }
 
-@keyframes drift{
-from{transform:translateY(0px);}
-to{transform:translateY(-18px);}
-}
+    body::after{
+      background:
+        radial-gradient(circle at 30% 70%, rgba(139,92,246,.07), transparent 20%),
+        radial-gradient(circle at 80% 60%, rgba(255,255,255,.03), transparent 12%);
+      animation: driftB 24s ease-in-out infinite alternate;
+    }
 
-.app{
-max-width:1180px;
-margin:auto;
-display:grid;
-grid-template-columns:340px 1fr;
-gap:22px;
-}
+    @keyframes driftA{
+      from{transform:translateY(0) translateX(0) scale(1);}
+      to{transform:translateY(-12px) translateX(8px) scale(1.03);}
+    }
 
-.card{
-background:var(--card);
-border:1px solid var(--line);
-border-radius:28px;
-box-shadow:var(--shadow);
-backdrop-filter:blur(12px);
-}
+    @keyframes driftB{
+      from{transform:translateY(0) translateX(0) scale(1);}
+      to{transform:translateY(10px) translateX(-10px) scale(1.02);}
+    }
 
-.sidebar{
-padding:24px;
-}
+    .app{
+      position:relative;
+      z-index:1;
+      max-width:1220px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:360px 1fr;
+      gap:22px;
+    }
 
-.brand{
-display:flex;
-align-items:center;
-gap:14px;
-margin-bottom:14px;
-}
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:26px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(12px);
+    }
 
-.logo{
-width:54px;
-height:54px;
-border-radius:50%;
-background:
-radial-gradient(circle at 30% 28%, rgba(255,255,255,.55), transparent 20%),
-linear-gradient(180deg,#7dd3fc,#2563eb);
-box-shadow:
-inset -8px -12px 18px rgba(0,0,0,.22),
-0 0 28px rgba(96,165,250,.45);
-position:relative;
-}
+    .sidebar{
+      padding:22px;
+    }
 
-.logo:after{
-content:"";
-position:absolute;
-bottom:-8px;
-left:50%;
-transform:translateX(-50%);
-width:12px;
-height:14px;
-background:#2563eb;
-clip-path:polygon(50% 100%,0 0,100% 0);
-}
+    .brand{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      margin-bottom:14px;
+    }
 
-h1{
-margin:0;
-font-size:34px;
-}
+    .logo{
+      width:54px;
+      height:54px;
+      border-radius:50%;
+      position:relative;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,.56), transparent 22%),
+        linear-gradient(180deg,#93c5fd,#2563eb);
+      box-shadow:
+        inset -8px -10px 18px rgba(0,0,0,.24),
+        0 0 28px rgba(96,165,250,.35);
+    }
 
-.sub{
-color:var(--muted);
-font-size:14px;
-line-height:1.45;
-margin-bottom:20px;
-}
+    .logo:after{
+      content:"";
+      position:absolute;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:-8px;
+      width:12px;
+      height:14px;
+      background:#2563eb;
+      clip-path:polygon(50% 100%,0 0,100% 0);
+    }
 
-.menu{
-display:grid;
-gap:12px;
-}
+    h1{
+      margin:0;
+      font-size:34px;
+      line-height:1;
+    }
 
-.option{
-padding:14px;
-border-radius:18px;
-border:1px solid var(--line);
-background:rgba(255,255,255,.04);
-cursor:pointer;
-transition:.18s ease;
-}
+    .sub{
+      color:var(--muted);
+      line-height:1.45;
+      margin:6px 0 18px;
+      font-size:14px;
+    }
 
-.option:hover{
-transform:translateY(-1px);
-background:rgba(255,255,255,.06);
-}
+    .preset-list{
+      display:grid;
+      gap:12px;
+      margin-bottom:18px;
+      max-height:520px;
+      overflow:auto;
+      padding-right:4px;
+    }
 
-.option strong{
-display:block;
-font-size:16px;
-margin-bottom:4px;
-}
+    .preset{
+      width:100%;
+      text-align:left;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      border-radius:18px;
+      padding:14px;
+      cursor:pointer;
+      transition:.18s ease;
+    }
 
-.option span{
-font-size:13px;
-color:var(--muted);
-}
+    .preset:hover{
+      transform:translateY(-1px);
+      background:rgba(255,255,255,.07);
+    }
 
-.controls{
-display:grid;
-grid-template-columns:1fr 1fr 1fr;
-gap:10px;
-margin-top:18px;
-}
+    .preset.active{
+      border-color:rgba(125,211,252,.45);
+      background:rgba(125,211,252,.10);
+      box-shadow:0 0 0 1px rgba(125,211,252,.08) inset;
+    }
 
-button{
-border:none;
-padding:14px;
-border-radius:16px;
-font-weight:700;
-font-size:15px;
-cursor:pointer;
-}
+    .preset-top{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      margin-bottom:6px;
+    }
 
-.start{background:#60a5fa;color:#07121e;}
-.pause{background:#dbeafe;color:#07121e;}
-.reset{background:#e2e8f0;color:#07121e;}
+    .preset-name{
+      font-size:17px;
+      font-weight:700;
+    }
 
-.main{
-padding:28px;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-gap:24px;
-min-height:760px;
-}
+    .preset-tag{
+      font-size:12px;
+      padding:5px 8px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      color:var(--muted);
+      white-space:nowrap;
+    }
 
-.orb-wrap{
-position:relative;
-width:360px;
-height:360px;
-display:flex;
-align-items:center;
-justify-content:center;
-}
+    .preset-pattern{
+      color:#d7eaff;
+      font-size:14px;
+      margin-bottom:4px;
+    }
 
-.glow{
-position:absolute;
-width:310px;
-height:310px;
-border-radius:50%;
-filter:blur(45px);
-background:rgba(96,165,250,.35);
-animation:pulse 5s ease-in-out infinite;
-}
+    .preset-desc{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+    }
 
-@keyframes pulse{
-0%,100%{transform:scale(.95);opacity:.35;}
-50%{transform:scale(1.08);opacity:.55;}
-}
+    .controls{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:10px;
+      margin:18px 0 12px;
+    }
 
-.orb{
-width:240px;
-height:240px;
-border-radius:50%;
-background:
-radial-gradient(circle at 30% 28%, rgba(255,255,255,.52), transparent 18%),
-linear-gradient(180deg,#7dd3fc,#2563eb);
-box-shadow:
-inset -18px -26px 34px rgba(0,0,0,.24),
-0 0 38px rgba(96,165,250,.35);
-transition:all 1s ease;
-position:relative;
-}
+    .btn{
+      border:none;
+      border-radius:16px;
+      padding:14px 12px;
+      font-size:15px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.18s ease;
+    }
 
-.orb:after{
-content:"";
-position:absolute;
-bottom:-18px;
-left:50%;
-transform:translateX(-50%);
-width:22px;
-height:26px;
-background:#2563eb;
-clip-path:polygon(50% 100%,0 0,100% 0);
-}
+    .btn:hover{ transform:translateY(-1px); }
+    .start{ background:var(--btn); color:#062135; }
+    .pause{ background:#dbeafe; color:#0b2238; }
+    .reset{ background:#e2e8f0; color:#0b2238; }
 
-.center{
-position:absolute;
-width:150px;
-height:150px;
-border-radius:50%;
-background:rgba(6,17,29,.68);
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-border:1px solid rgba(255,255,255,.08);
-backdrop-filter:blur(6px);
-}
+    .audio-box{
+      margin-top:12px;
+      padding:14px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:rgba(255,255,255,.04);
+    }
 
-.phase{
-font-size:15px;
-letter-spacing:2px;
-margin-bottom:8px;
-color:#d9ebff;
-font-weight:700;
-}
+    .audio-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:10px;
+      font-size:14px;
+      color:var(--muted);
+    }
 
-.count{
-font-size:62px;
-font-weight:800;
-line-height:1;
-}
+    .audio-row:last-child{ margin-bottom:0; }
 
-.prompt{
-margin-top:8px;
-font-size:15px;
-font-weight:700;
-}
+    input[type="checkbox"]{
+      transform:scale(1.1);
+      accent-color:#7dd3fc;
+    }
 
-.footer{
-width:100%;
-max-width:720px;
-display:grid;
-gap:16px;
-}
+    .stats{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-top:14px;
+    }
 
-.support{
-padding:18px;
-border-radius:22px;
-border:1px solid var(--line);
-background:rgba(255,255,255,.04);
-text-align:center;
-}
+    .stat{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      border-radius:18px;
+      padding:14px;
+    }
 
-.support h3{
-margin:0 0 8px;
-font-size:22px;
-}
+    .stat-label{
+      color:var(--muted);
+      font-size:13px;
+      margin-bottom:7px;
+    }
 
-.support p{
-margin:0 0 14px;
-color:var(--muted);
-font-size:14px;
-}
+    .stat-value{
+      font-size:24px;
+      font-weight:800;
+    }
 
-.support a{
-display:inline-block;
-padding:14px 22px;
-border-radius:16px;
-background:#3b82f6;
-color:white;
-text-decoration:none;
-font-weight:800;
-}
+    .main{
+      padding:26px;
+      display:flex;
+      flex-direction:column;
+      gap:22px;
+      align-items:center;
+      justify-content:center;
+      min-height:780px;
+    }
 
-.small{
-font-size:13px;
-color:var(--muted);
-text-align:center;
-line-height:1.45;
-}
+    .orb-wrap{
+      position:relative;
+      width:380px;
+      height:380px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
 
-@media(max-width:900px){
-.app{grid-template-columns:1fr;}
-.main{min-height:auto;}
-.orb-wrap{width:300px;height:300px;}
-.orb{width:210px;height:210px;}
-.center{width:136px;height:136px;}
-.count{font-size:50px;}
-}
-</style>
+    .glow{
+      position:absolute;
+      width:320px;
+      height:320px;
+      border-radius:50%;
+      filter:blur(45px);
+      opacity:.42;
+      transition:.35s ease;
+      background:radial-gradient(circle, rgba(125,211,252,.45) 0%, rgba(125,211,252,0) 70%);
+    }
+
+    .orb{
+      position:relative;
+      width:245px;
+      height:245px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:transform .85s ease, box-shadow .35s ease, background .22s linear;
+      border:1px solid rgba(255,255,255,.12);
+      overflow:hidden;
+      box-shadow:
+        inset -16px -24px 45px rgba(0,0,0,.24),
+        inset 14px 16px 28px rgba(255,255,255,.12),
+        0 0 45px rgba(125,211,252,.18);
+    }
+
+    .orb:before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:50%;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,.50) 0%, rgba(255,255,255,.16) 18%, transparent 34%),
+        radial-gradient(circle at 35% 35%, rgba(255,255,255,.08), transparent 58%);
+      pointer-events:none;
+    }
+
+    .orb:after{
+      content:"";
+      position:absolute;
+      bottom:-18px;
+      width:22px;
+      height:28px;
+      background:rgba(255,255,255,.10);
+      clip-path:polygon(50% 100%, 0 0, 100% 0);
+      filter:drop-shadow(0 4px 4px rgba(0,0,0,.18));
+    }
+
+    .orb-center{
+      position:relative;
+      z-index:2;
+      width:154px;
+      height:154px;
+      border-radius:50%;
+      background:rgba(7,17,31,.58);
+      border:1px solid rgba(255,255,255,.10);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      backdrop-filter:blur(6px);
+    }
+
+    .phase{
+      font-size:15px;
+      color:#dcecff;
+      margin-bottom:8px;
+      text-transform:uppercase;
+      letter-spacing:2px;
+      font-weight:700;
+    }
+
+    .count{
+      font-size:62px;
+      line-height:1;
+      font-weight:800;
+      margin-bottom:8px;
+    }
+
+    .prompt{
+      font-size:15px;
+      font-weight:700;
+      color:#f4fbff;
+    }
+
+    .progress-wrap{
+      width:100%;
+      max-width:740px;
+    }
+
+    .bar-label{
+      display:flex;
+      justify-content:space-between;
+      margin-bottom:8px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .bar{
+      width:100%;
+      height:16px;
+      background:rgba(255,255,255,.08);
+      border-radius:999px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.06);
+    }
+
+    .bar-fill{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg, #ef4444, #8b5cf6, #60a5fa);
+      border-radius:999px;
+      transition:width .35s linear;
+    }
+
+    .mini-grid{
+      width:100%;
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:18px;
+    }
+
+    .mini{
+      padding:18px 16px;
+      text-align:center;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:22px;
+    }
+
+    .mini h3{
+      margin:0 0 12px;
+      font-size:18px;
+    }
+
+    .mini-ring{
+      width:120px;
+      height:120px;
+      margin:0 auto 10px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:.35s ease;
+      background:conic-gradient(rgba(255,255,255,.12) 0deg, rgba(255,255,255,.08) 0deg);
+    }
+
+    .mini-center{
+      width:84px;
+      height:84px;
+      border-radius:50%;
+      background:#091423;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid rgba(255,255,255,.08);
+      font-weight:800;
+      font-size:22px;
+    }
+
+    .mini small{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .support{
+      width:100%;
+      max-width:740px;
+      padding:18px;
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:20px;
+      background:rgba(255,255,255,.03);
+      text-align:center;
+    }
+
+    .support h3{
+      margin:0 0 8px;
+      font-size:19px;
+      font-weight:600;
+    }
+
+    .support p{
+      margin:0 0 12px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.45;
+    }
+
+    .support a{
+      display:inline-block;
+      padding:12px 18px;
+      border-radius:14px;
+      background:#3b82f6;
+      color:#fff;
+      text-decoration:none;
+      font-weight:700;
+    }
+
+    .footer-note{
+      color:var(--muted);
+      text-align:center;
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    @media (max-width: 900px){
+      .app{ grid-template-columns:1fr; }
+      .main{ min-height:auto; }
+      .orb-wrap{ width:310px; height:310px; }
+      .orb{ width:215px; height:215px; }
+      .orb-center{ width:138px; height:138px; }
+      .count{ font-size:50px; }
+      .mini-grid{ grid-template-columns:1fr; }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="app">
+    <div class="card sidebar">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <h1>Breathora</h1>
+          <div class="sub">Guided breathing for stress relief, calm, focus, and better downshifting.</div>
+        </div>
+      </div>
 
-<div class="app">
+      <div class="preset-list" id="presetList"></div>
 
-<div class="card sidebar">
+      <div class="controls">
+        <button class="btn start" id="startBtn">Start</button>
+        <button class="btn pause" id="pauseBtn">Pause</button>
+        <button class="btn reset" id="resetBtn">Reset</button>
+      </div>
 
-<div class="brand">
-<div class="logo"></div>
-<div>
-<h1>Breathora</h1>
-<div class="sub">Guided breathing for stress relief, calm, focus & wellness.</div>
-</div>
-</div>
+      <div class="audio-box">
+        <div class="audio-row">
+          <span>Tone cues</span>
+          <input type="checkbox" id="toneToggle" checked />
+        </div>
+        <div class="audio-row">
+          <span>Voice cues</span>
+          <input type="checkbox" id="voiceToggle" />
+        </div>
+        <div class="audio-row">
+          <span>Count out loud</span>
+          <input type="checkbox" id="countToggle" />
+        </div>
+      </div>
 
-<div class="menu">
-<div class="option"><strong>Box Breathing</strong><span>Calm & focus • 4x4x4x4</span></div>
-<div class="option"><strong>4-6 Relax</strong><span>De-stress • 4 in / 6 out</span></div>
-<div class="option"><strong>Deep Calm</strong><span>Sleep mode • 4-7-8</span></div>
-<div class="option"><strong>Physiological Sigh</strong><span>Fast reset / vagus nerve</span></div>
-</div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Technique</div>
+          <div class="stat-value" id="techniqueName">Box</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Cycles</div>
+          <div class="stat-value" id="cyclesCompleted">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Session</div>
+          <div class="stat-value" id="sessionTime">0:00</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">State</div>
+          <div class="stat-value" id="runState">Ready</div>
+        </div>
+      </div>
+    </div>
 
-<div class="controls">
-<button class="start">Start</button>
-<button class="pause">Pause</button>
-<button class="reset">Reset</button>
-</div>
+    <div class="card main">
+      <div class="orb-wrap">
+        <div class="glow" id="glow"></div>
+        <div class="orb" id="orb">
+          <div class="orb-center">
+            <div class="phase" id="phaseLabel">READY</div>
+            <div class="count" id="countLabel">0</div>
+            <div class="prompt" id="promptLabel">Press Start</div>
+          </div>
+        </div>
+      </div>
 
-</div>
+      <div class="progress-wrap">
+        <div class="bar-label">
+          <span>Cycle Progress</span>
+          <span id="cyclePercent">0%</span>
+        </div>
+        <div class="bar">
+          <div class="bar-fill" id="cycleBar"></div>
+        </div>
+      </div>
 
-<div class="card main">
+      <div class="mini-grid">
+        <div class="mini">
+          <h3>Inhale</h3>
+          <div class="mini-ring" id="inhaleRing">
+            <div class="mini-center" id="inhaleValue">0</div>
+          </div>
+          <small id="inhaleText">Ready</small>
+        </div>
 
-<div class="orb-wrap">
-<div class="glow"></div>
+        <div class="mini">
+          <h3>Hold</h3>
+          <div class="mini-ring" id="holdRing">
+            <div class="mini-center" id="holdValue">0</div>
+          </div>
+          <small id="holdText">Ready</small>
+        </div>
 
-<div class="orb" id="orb">
-<div class="center">
-<div class="phase" id="phase">READY</div>
-<div class="count" id="count">0</div>
-<div class="prompt" id="prompt">Press Start</div>
-</div>
-</div>
-</div>
+        <div class="mini">
+          <h3>Exhale</h3>
+          <div class="mini-ring" id="exhaleRing">
+            <div class="mini-center" id="exhaleValue">0</div>
+          </div>
+          <small id="exhaleText">Ready</small>
+        </div>
+      </div>
 
-<div class="footer">
+      <div class="support">
+        <h3>Optional Support</h3>
+        <p>If this app helps you feel calmer, support future improvements.</p>
+        <a href="https://venmo.com/Breathora" target="_blank" rel="noopener">Donate</a>
+      </div>
 
-<div class="support">
-<h3>Support Breathora</h3>
-<p>If this app helps calm your nervous system, support future updates.</p>
-<a href="https://venmo.com/Breathora" target="_blank">Donate via Venmo</a>
-</div>
+      <div class="footer-note" id="techniqueDesc">
+        Balanced breathing for calm and control.
+      </div>
+    </div>
+  </div>
 
-<div class="small">
-Breathora • Breathe. Reset. Recover.<br>
-Free guided breathing tool.
-</div>
+  <script>
+    const techniques = [
+      {
+        id: "box",
+        name: "Box Breathing",
+        tag: "Calming",
+        pattern: "4 in • 4 hold • 4 out • 4 hold",
+        description: "Balanced breathing for calm and control.",
+        phases: [
+          { name: "Inhale", seconds: 4, type: "inhale" },
+          { name: "Hold", seconds: 4, type: "hold" },
+          { name: "Exhale", seconds: 4, type: "exhale" },
+          { name: "Hold", seconds: 4, type: "hold" }
+        ]
+      },
+      {
+        id: "relax",
+        name: "4-6 Relax",
+        tag: "De-Stress",
+        pattern: "4 in • 6 out",
+        description: "Longer exhale helps settle the system.",
+        phases: [
+          { name: "Inhale", seconds: 4, type: "inhale" },
+          { name: "Exhale", seconds: 6, type: "exhale" }
+        ]
+      },
+      {
+        id: "focus",
+        name: "Focus Reset",
+        tag: "Focus",
+        pattern: "4 in • 2 hold • 4 out",
+        description: "Simple reset when your head feels busy.",
+        phases: [
+          { name: "Inhale", seconds: 4, type: "inhale" },
+          { name: "Hold", seconds: 2, type: "hold" },
+          { name: "Exhale", seconds: 4, type: "exhale" }
+        ]
+      },
+      {
+        id: "deep",
+        name: "Deep Calm",
+        tag: "Sleepy / Calm",
+        pattern: "4 in • 7 hold • 8 out",
+        description: "Slow breathing for deeper relaxation.",
+        phases: [
+          { name: "Inhale", seconds: 4, type: "inhale" },
+          { name: "Hold", seconds: 7, type: "hold" },
+          { name: "Exhale", seconds: 8, type: "exhale" }
+        ]
+      },
+      {
+        id: "physiological",
+        name: "Physiological Sigh",
+        tag: "Vagus Nerve",
+        pattern: "3 in • 1 top-up • 6 out",
+        description: "Fast reset when you feel wound up.",
+        phases: [
+          { name: "Inhale", seconds: 3, type: "inhale" },
+          { name: "Top-Up", seconds: 1, type: "inhale2" },
+          { name: "Exhale", seconds: 6, type: "exhale" }
+        ]
+      },
+      {
+        id: "energize",
+        name: "Wake Up",
+        tag: "Energy",
+        pattern: "6 in • 2 hold • 4 out",
+        description: "A little more inhale to wake you up without rushing.",
+        phases: [
+          { name: "Inhale", seconds: 6, type: "inhale" },
+          { name: "Hold", seconds: 2, type: "hold" },
+          { name: "Exhale", seconds: 4, type: "exhale" }
+        ]
+      }
+    ];
 
-</div>
+    let selectedTechnique = techniques[0];
+    let currentPhaseIndex = 0;
+    let phaseRemaining = selectedTechnique.phases[0].seconds;
+    let timer = null;
+    let sessionTimer = null;
+    let sessionSeconds = 0;
+    let cyclesCompleted = 0;
+    let isRunning = false;
+    let audioCtx = null;
 
-</div>
-</div>
+    const presetList = document.getElementById("presetList");
+    const orb = document.getElementById("orb");
+    const glow = document.getElementById("glow");
+    const phaseLabel = document.getElementById("phaseLabel");
+    const countLabel = document.getElementById("countLabel");
+    const promptLabel = document.getElementById("promptLabel");
+    const cycleBar = document.getElementById("cycleBar");
+    const cyclePercent = document.getElementById("cyclePercent");
+    const techniqueName = document.getElementById("techniqueName");
+    const techniqueDesc = document.getElementById("techniqueDesc");
+    const cyclesEl = document.getElementById("cyclesCompleted");
+    const sessionEl = document.getElementById("sessionTime");
+    const stateEl = document.getElementById("runState");
+    const toneToggle = document.getElementById("toneToggle");
+    const voiceToggle = document.getElementById("voiceToggle");
+    const countToggle = document.getElementById("countToggle");
 
-<script>
-let running=false;
-let phase=0;
-let count=4;
-let timer;
+    function renderTechniques() {
+      presetList.innerHTML = "";
+      techniques.forEach(t => {
+        const btn = document.createElement("button");
+        btn.className = "preset" + (t.id === selectedTechnique.id ? " active" : "");
+        btn.innerHTML = `
+          <div class="preset-top">
+            <div class="preset-name">${t.name}</div>
+            <div class="preset-tag">${t.tag}</div>
+          </div>
+          <div class="preset-pattern">${t.pattern}</div>
+          <div class="preset-desc">${t.description}</div>
+        `;
+        btn.onclick = () => selectTechnique(t.id);
+        presetList.appendChild(btn);
+      });
+    }
 
-const phases=[
-{name:"INHALE",secs:4,color1:"#60a5fa",color2:"#2563eb"},
-{name:"HOLD",secs:4,color1:"#facc15",color2:"#f59e0b"},
-{name:"EXHALE",secs:4,color1:"#22c55e",color2:"#ef4444"},
-{name:"HOLD",secs:4,color1:"#facc15",color2:"#f59e0b"}
-];
+    function selectTechnique(id) {
+      const found = techniques.find(t => t.id === id);
+      if (!found) return;
+      selectedTechnique = found;
+      resetSession(false);
+      renderTechniques();
+      updateUI();
+    }
 
-function updateUI(){
-document.getElementById("phase").textContent=phases[phase].name;
-document.getElementById("count").textContent=count;
-document.getElementById("prompt").textContent=phases[phase].name;
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return `${m}:${String(s).padStart(2, "0")}`;
+    }
 
-const p=phases[phase];
-document.getElementById("orb").style.background=
-`radial-gradient(circle at 30% 28%, rgba(255,255,255,.52), transparent 18%), linear-gradient(180deg, ${p.color1}, ${p.color2})`;
-}
+    function getCurrentPhase() {
+      return selectedTechnique.phases[currentPhaseIndex];
+    }
 
-function tick(){
-count--;
-if(count<=0){
-phase=(phase+1)%phases.length;
-count=phases[phase].secs;
-}
-updateUI();
-}
+    function getCycleSeconds() {
+      return selectedTechnique.phases.reduce((sum, p) => sum + p.seconds, 0);
+    }
 
-document.querySelector(".start").onclick=()=>{
-if(running)return;
-running=true;
-updateUI();
-timer=setInterval(tick,1000);
-};
+    function getElapsedThisCycle() {
+      let elapsed = 0;
+      for (let i = 0; i < currentPhaseIndex; i++) {
+        elapsed += selectedTechnique.phases[i].seconds;
+      }
+      elapsed += getCurrentPhase().seconds - phaseRemaining;
+      return elapsed;
+    }
 
-document.querySelector(".pause").onclick=()=>{
-running=false;
-clearInterval(timer);
-};
+    function setRing(id, percent, color, value, label) {
+      const ring = document.getElementById(id + "Ring");
+      const val = document.getElementById(id + "Value");
+      const text = document.getElementById(id + "Text");
+      ring.style.background = `conic-gradient(${color} ${percent * 3.6}deg, rgba(255,255,255,.10) 0deg)`;
+      val.textContent = value;
+      text.textContent = label;
+    }
 
-document.querySelector(".reset").onclick=()=>{
-running=false;
-clearInterval(timer);
-phase=0;
-count=4;
-updateUI();
-};
+    function updateMiniRings() {
+      const current = getCurrentPhase();
+      const inhalePhase = selectedTechnique.phases.find(p => p.type === "inhale" || p.type === "inhale2");
+      const holdPhase = selectedTechnique.phases.find(p => p.type === "hold");
+      const exhalePhase = selectedTechnique.phases.find(p => p.type === "exhale");
 
-updateUI();
-</script>
+      let inhalePercent = 0;
+      let holdPercent = 0;
+      let exhalePercent = 0;
 
+      const inhaleIndex = selectedTechnique.phases.findIndex(p => p.type === "inhale" || p.type === "inhale2");
+      const holdIndex = selectedTechnique.phases.findIndex(p => p.type === "hold");
+
+      if (current.type === "inhale" || current.type === "inhale2") {
+        inhalePercent = ((current.seconds - phaseRemaining) / current.seconds) * 100;
+      } else if (currentPhaseIndex > inhaleIndex && inhaleIndex !== -1) {
+        inhalePercent = 100;
+      }
+
+      if (holdPhase) {
+        if (current.type === "hold") {
+          holdPercent = ((current.seconds - phaseRemaining) / current.seconds) * 100;
+        } else if (currentPhaseIndex > holdIndex && holdIndex !== -1) {
+          holdPercent = 100;
+        }
+      }
+
+      if (current.type === "exhale") {
+        exhalePercent = ((current.seconds - phaseRemaining) / current.seconds) * 100;
+      }
+
+      setRing(
+        "inhale",
+        inhalePercent,
+        "#60a5fa",
+        inhalePhase ? inhalePhase.seconds : 0,
+        (current.type === "inhale" || current.type === "inhale2") ? `${phaseRemaining}s left` : inhalePhase ? `${inhalePhase.seconds}s` : "N/A"
+      );
+
+      setRing(
+        "hold",
+        holdPercent,
+        "#f59e0b",
+        holdPhase ? holdPhase.seconds : 0,
+        holdPhase ? (current.type === "hold" ? `${phaseRemaining}s left` : `${holdPhase.seconds}s`) : "No hold"
+      );
+
+      setRing(
+        "exhale",
+        exhalePercent,
+        "#ef4444",
+        exhalePhase ? exhalePhase.seconds : 0,
+        current.type === "exhale" ? `${phaseRemaining}s left` : exhalePhase ? `${exhalePhase.seconds}s` : "N/A"
+      );
+    }
+
+    function getOrbStyle(type, progress) {
+      if (type === "inhale") {
+        const hue = 0 + (progress * 220);
+        const sat = 82;
+        const light = 52;
+        const scale = 0.90 + (progress * 0.30);
+        return { hue, sat, light, scale, glowAlpha: 0.28 + (progress * 0.28) };
+      }
+
+      if (type === "inhale2") {
+        const hue = 220;
+        const sat = 88;
+        const light = 58;
+        const scale = 1.18 + (progress * 0.05);
+        return { hue, sat, light, scale, glowAlpha: 0.55 };
+      }
+
+      if (type === "hold") {
+        const hue = 220 - (progress * 220);
+        const sat = 84;
+        const light = 54;
+        const scale = 1.18;
+        return { hue, sat, light, scale, glowAlpha: 0.42 };
+      }
+
+      if (type === "exhale") {
+        const hue = 15 - (progress * 15);
+        const sat = 78 - (progress * 16);
+        const light = 50 - (progress * 18);
+        const scale = 1.16 - (progress * 0.30);
+        return { hue, sat, light, scale, glowAlpha: 0.34 - (progress * 0.16) };
+      }
+
+      return { hue: 210, sat: 80, light: 50, scale: 1, glowAlpha: 0.35 };
+    }
+
+    function updateOrbVisual() {
+      const current = getCurrentPhase();
+      const progress = (current.seconds - phaseRemaining) / current.seconds;
+      const c = getOrbStyle(current.type, progress);
+
+      orb.style.transform = `scale(${c.scale})`;
+      orb.style.background = `
+        radial-gradient(circle at 50% ${100 - (progress * 68)}%, rgba(255,255,255,.12), transparent 55%),
+        linear-gradient(180deg, hsla(${c.hue}, ${c.sat}%, ${c.light + 8}%, .98), hsla(${c.hue}, ${c.sat}%, ${c.light - 10}%, .98))
+      `;
+      orb.style.boxShadow = `
+        inset -16px -24px 45px rgba(0,0,0,.24),
+        inset 14px 16px 28px rgba(255,255,255,.12),
+        0 0 55px hsla(${c.hue}, ${c.sat}%, ${c.light}%, ${c.glowAlpha})
+      `;
+      glow.style.opacity = c.glowAlpha;
+      glow.style.background = `radial-gradient(circle, hsla(${c.hue}, ${c.sat}%, ${c.light}%, .50) 0%, hsla(${c.hue}, ${c.sat}%, ${c.light}%, 0) 70%)`;
+    }
+
+    function updateUI() {
+      const current = getCurrentPhase();
+
+      phaseLabel.textContent = current.name.toUpperCase();
+      countLabel.textContent = phaseRemaining;
+      promptLabel.textContent = current.type === "inhale2" ? "Quick top-up" : current.name;
+      techniqueName.textContent = selectedTechnique.name;
+      techniqueDesc.textContent = selectedTechnique.description;
+      cyclesEl.textContent = cyclesCompleted;
+      sessionEl.textContent = formatTime(sessionSeconds);
+      stateEl.textContent = isRunning ? "Running" : "Ready";
+
+      const cycleProgress = Math.round((getElapsedThisCycle() / getCycleSeconds()) * 100);
+      cycleBar.style.width = cycleProgress + "%";
+      cyclePercent.textContent = cycleProgress + "%";
+
+      updateOrbVisual();
+      updateMiniRings();
+    }
+
+    function ensureAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(type) {
+      if (!toneToggle.checked) return;
+      ensureAudio();
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const now = audioCtx.currentTime;
+
+      osc.type = "sine";
+
+      if (type === "inhale") osc.frequency.value = 540;
+      else if (type === "inhale2") osc.frequency.value = 700;
+      else if (type === "hold") osc.frequency.value = 430;
+      else if (type === "exhale") osc.frequency.value = 320;
+      else osc.frequency.value = 500;
+
+      gain.gain.value = 0.0001;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      gain.gain.linearRampToValueAtTime(0.07, now + 0.02);
+      gain.gain.linearRampToValueAtTime(0.0001, now + 0.18);
+
+      osc.start(now);
+      osc.stop(now + 0.22);
+    }
+
+    function speak(text) {
+      if (!voiceToggle.checked) return;
+      if (!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.rate = 0.92;
+      utter.pitch = 1;
+      utter.volume = 1;
+      window.speechSynthesis.speak(utter);
+    }
+
+    function announcePhase() {
+      const current = getCurrentPhase();
+      playTone(current.type);
+
+      if (voiceToggle.checked) {
+        if (current.type === "inhale2") speak("Quick inhale");
+        else speak(current.name);
+      }
+    }
+
+    function announceCount() {
+      if (!countToggle.checked || !voiceToggle.checked) return;
+
+      const current = getCurrentPhase();
+      if (current.type === "inhale2") return;
+      if (phaseRemaining <= 1) return;
+
+      const spokenCount = (current.seconds - phaseRemaining) + 2;
+      speak(String(spokenCount));
+    }
+
+    function step() {
+      if (phaseRemaining > 1) {
+        phaseRemaining -= 1;
+        updateUI();
+        announceCount();
+      } else {
+        currentPhaseIndex += 1;
+
+        if (currentPhaseIndex >= selectedTechnique.phases.length) {
+          currentPhaseIndex = 0;
+          cyclesCompleted += 1;
+        }
+
+        phaseRemaining = selectedTechnique.phases[currentPhaseIndex].seconds;
+        updateUI();
+        announcePhase();
+      }
+    }
+
+    function startSession() {
+      if (isRunning) return;
+
+      ensureAudio();
+      isRunning = true;
+      stateEl.textContent = "Running";
+      updateUI();
+      announcePhase();
+
+      timer = setInterval(step, 1000);
+      sessionTimer = setInterval(() => {
+        sessionSeconds += 1;
+        sessionEl.textContent = formatTime(sessionSeconds);
+      }, 1000);
+    }
+
+    function pauseSession() {
+      isRunning = false;
+      clearInterval(timer);
+      clearInterval(sessionTimer);
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      stateEl.textContent = "Paused";
+    }
+
+    function resetSession(render = true) {
+      clearInterval(timer);
+      clearInterval(sessionTimer);
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+
+      isRunning = false;
+      currentPhaseIndex = 0;
+      phaseRemaining = selectedTechnique.phases[0].seconds;
+      sessionSeconds = 0;
+      cyclesCompleted = 0;
+
+      if (render) renderTechniques();
+      updateUI();
+      stateEl.textContent = "Ready";
+    }
+
+    document.getElementById("startBtn").onclick = startSession;
+    document.getElementById("pauseBtn").onclick = pauseSession;
+    document.getElementById("resetBtn").onclick = () => resetSession();
+
+    renderTechniques();
+    updateUI();
+  </script>
 </body>
 </html>
