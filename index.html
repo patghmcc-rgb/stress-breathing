@@ -6,12 +6,12 @@
   <title>Breathora</title>
   <style>
     :root{
-      --text:#eef7ff;
-      --muted:#c7d8e8;
-      --card:rgba(8,16,26,.50);
-      --line:rgba(255,255,255,.12);
-      --shadow:0 24px 70px rgba(0,0,0,.35);
-      --btn:#8fd3ff;
+      --text:#eef6fb;
+      --muted:#c4d4de;
+      --card:rgba(8,16,24,.32);
+      --line:rgba(255,255,255,.10);
+      --shadow:0 24px 70px rgba(0,0,0,.28);
+      --btn:#9ad8ff;
     }
 
     *{box-sizing:border-box}
@@ -23,126 +23,184 @@
       color:var(--text);
       overflow-x:hidden;
       background:
-        radial-gradient(circle at 50% 10%, rgba(255,214,140,.22), transparent 20%),
-        linear-gradient(180deg, #07111b 0%, #0f2a3a 35%, #19485a 68%, #215f69 100%);
+        linear-gradient(180deg, #09131d 0%, #163247 34%, #2d5a69 70%, #406f73 100%);
     }
 
     .bg{
-  position:fixed;
-  inset:0;
-  overflow:hidden;
-  pointer-events:none;
-  z-index:0;
-}
+      position:fixed;
+      inset:0;
+      overflow:hidden;
+      pointer-events:none;
+      z-index:0;
+    }
 
-.sun{
-  position:absolute;
-  width:520px;
-  height:520px;
-  left:50%;
-  top:4%;
-  transform:translateX(-50%);
-  border-radius:50%;
-  background:radial-gradient(circle,
-    rgba(255,225,155,.82) 0%,
-    rgba(255,175,90,.52) 34%,
-    rgba(255,175,90,0) 74%);
-  filter:blur(22px);
-  animation:sunPulse 8s ease-in-out infinite;
-}
+    .sun-halo{
+      position:absolute;
+      width:480px;
+      height:480px;
+      left:50%;
+      top:4%;
+      transform:translateX(-50%);
+      border-radius:50%;
+      background:radial-gradient(circle,
+        rgba(255,220,150,.36) 0%,
+        rgba(255,180,100,.18) 36%,
+        rgba(255,180,100,0) 72%);
+      filter:blur(28px);
+      animation:sunBreath 12s ease-in-out infinite;
+    }
 
-.mist{
-  position:absolute;
-  border-radius:50%;
-  filter:blur(34px);
-  opacity:.95;
-  animation:drift 12s ease-in-out infinite alternate;
-}
+    .sun{
+      position:absolute;
+      width:170px;
+      height:170px;
+      left:50%;
+      top:10%;
+      transform:translateX(-50%);
+      border-radius:50%;
+      background:radial-gradient(circle at 40% 35%,
+        rgba(255,248,220,.95) 0%,
+        rgba(255,220,145,.92) 28%,
+        rgba(255,177,92,.88) 68%,
+        rgba(255,160,85,.82) 100%);
+      box-shadow:
+        0 0 26px rgba(255,210,130,.28),
+        0 0 70px rgba(255,190,110,.18);
+      opacity:.92;
+    }
 
-.m1{
-  width:420px;
-  height:420px;
-  left:-3%;
-  top:12%;
-  background:rgba(80,230,255,.70);
-}
+    .mist{
+      position:absolute;
+      border-radius:50%;
+      filter:blur(42px);
+      animation:mistFloat 18s ease-in-out infinite alternate;
+    }
 
-.m2{
-  width:520px;
-  height:520px;
-  right:-4%;
-  top:18%;
-  background:rgba(255,190,95,.58);
-  animation-duration:16s;
-}
+    .mist1{
+      width:380px;
+      height:220px;
+      left:-4%;
+      top:20%;
+      background:rgba(110,225,255,.20);
+    }
 
-.m3{
-  width:420px;
-  height:420px;
-  left:10%;
-  bottom:2%;
-  background:rgba(90,255,190,.46);
-  animation-duration:14s;
-}
+    .mist2{
+      width:430px;
+      height:240px;
+      right:-6%;
+      top:26%;
+      background:rgba(255,194,110,.18);
+      animation-duration:22s;
+    }
 
-.m4{
-  width:420px;
-  height:420px;
-  right:10%;
-  bottom:6%;
-  background:rgba(165,120,255,.42);
-  animation-duration:18s;
-}
+    .mist3{
+      width:360px;
+      height:220px;
+      left:12%;
+      bottom:22%;
+      background:rgba(105,255,198,.14);
+      animation-duration:20s;
+    }
 
-.ripple{
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:260px;
-  height:260px;
-  margin-left:-130px;
-  margin-top:-130px;
-  border-radius:50%;
-  border:3px solid rgba(255,255,255,.30);
-  animation:ripple 7s linear infinite;
-}
+    .mist4{
+      width:340px;
+      height:210px;
+      right:10%;
+      bottom:24%;
+      background:rgba(171,143,255,.14);
+      animation-duration:24s;
+    }
 
-.r2{ animation-delay:2.3s; }
-.r3{ animation-delay:4.6s; }
+    .mountains{
+      position:absolute;
+      inset:auto 0 0 0;
+      height:48%;
+    }
 
-.grain{
-  position:absolute;
-  inset:0;
-  opacity:.16;
-  background-image:
-    radial-gradient(rgba(255,255,255,.7) .7px, transparent .7px);
-  background-size:18px 18px;
-}
+    .mountain{
+      position:absolute;
+      left:-10%;
+      width:120%;
+      border-radius:50% 50% 0 0 / 100% 100% 0 0;
+      filter:blur(.2px);
+    }
 
-@keyframes drift{
-  from{ transform:translate(0,0) scale(1); }
-  to{ transform:translate(42px,-28px) scale(1.18); }
-}
+    .mountain.back{
+      bottom:8%;
+      height:34%;
+      background:linear-gradient(180deg, rgba(21,49,62,.85), rgba(13,32,43,.96));
+    }
 
-@keyframes ripple{
-  0%{
-    transform:scale(.55);
-    opacity:.38;
-  }
-  100%{
-    transform:scale(5.3);
-    opacity:0;
-  }
-}
+    .mountain.mid{
+      bottom:0;
+      height:42%;
+      background:linear-gradient(180deg, rgba(16,40,50,.96), rgba(7,21,30,1));
+    }
 
-@keyframes sunPulse{
-  0%,100%{
-    transform:translateX(-50%) scale(1);
-  }
-  50%{
-    transform:translateX(-50%) scale(1.12);
-  }
-}
+    .mountain.front{
+      bottom:-6%;
+      height:28%;
+      background:linear-gradient(180deg, rgba(10,26,34,.98), rgba(5,15,23,1));
+    }
+
+    .ripple-wrap{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      opacity:.24;
+    }
+
+    .ripple{
+      position:absolute;
+      width:240px;
+      height:240px;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.13);
+      animation:ripple 9s linear infinite;
+    }
+
+    .r2{ animation-delay:3s; }
+    .r3{ animation-delay:6s; }
+
+    .particles{
+      position:absolute;
+      inset:0;
+    }
+
+    .particle{
+      position:absolute;
+      width:4px;
+      height:4px;
+      border-radius:50%;
+      background:rgba(255,245,220,.65);
+      box-shadow:0 0 10px rgba(255,245,220,.35);
+      animation:particleFloat linear infinite;
+    }
+
+    @keyframes sunBreath{
+      0%,100%{ transform:translateX(-50%) scale(1); opacity:.9; }
+      50%{ transform:translateX(-50%) scale(1.06); opacity:1; }
+    }
+
+    @keyframes mistFloat{
+      from{ transform:translate(0,0) scale(1); }
+      to{ transform:translate(36px,-20px) scale(1.12); }
+    }
+
+    @keyframes ripple{
+      0%{ transform:scale(.65); opacity:.26; }
+      100%{ transform:scale(5.2); opacity:0; }
+    }
+
+    @keyframes particleFloat{
+      0%{ transform:translateY(0) translateX(0); opacity:0; }
+      10%{ opacity:1; }
+      90%{ opacity:1; }
+      100%{ transform:translateY(-120px) translateX(20px); opacity:0; }
+    }
+
     .app{
       position:relative;
       z-index:1;
@@ -182,8 +240,8 @@
         radial-gradient(circle at 30% 24%, rgba(255,255,255,.52), transparent 22%),
         linear-gradient(180deg,#95d7ff,#2463e8);
       box-shadow:
-        inset -10px -12px 20px rgba(0,0,0,.22),
-        0 0 28px rgba(90,170,255,.35);
+        inset -10px -12px 20px rgba(0,0,0,.18),
+        0 0 24px rgba(90,170,255,.30);
     }
 
     .logo:after{
@@ -214,7 +272,7 @@
     .preset-list{
       display:grid;
       gap:12px;
-      max-height:380px;
+      max-height:360px;
       overflow:auto;
       padding-right:4px;
       margin-bottom:18px;
@@ -238,9 +296,9 @@
     }
 
     .preset.active{
-      border-color:rgba(143,211,255,.48);
-      background:rgba(143,211,255,.10);
-      box-shadow:0 0 0 1px rgba(143,211,255,.08) inset;
+      border-color:rgba(154,216,255,.42);
+      background:rgba(154,216,255,.10);
+      box-shadow:0 0 0 1px rgba(154,216,255,.08) inset;
     }
 
     .preset-top{
@@ -316,8 +374,8 @@
     }
 
     .time-btn.active{
-      background:rgba(143,211,255,.18);
-      box-shadow:0 0 0 1px rgba(143,211,255,.18) inset;
+      background:rgba(154,216,255,.18);
+      box-shadow:0 0 0 1px rgba(154,216,255,.18) inset;
     }
 
     .custom-row{
@@ -449,8 +507,9 @@
         conic-gradient(#8fd3ff 0deg, rgba(255,255,255,.10) 0deg);
       box-shadow:
         inset 0 0 24px rgba(255,255,255,.06),
-        0 0 28px rgba(143,211,255,.18);
+        0 0 28px rgba(143,211,255,.16);
       border:1px solid rgba(255,255,255,.10);
+      transition:all .4s ease;
     }
 
     .timer-center{
@@ -548,30 +607,33 @@
 
     .glow{
       position:absolute;
-      width:330px;
-      height:330px;
+      width:320px;
+      height:320px;
       border-radius:50%;
-      filter:blur(46px);
-      opacity:.48;
-      transition:.3s ease;
-      background:radial-gradient(circle, rgba(120,210,255,.45) 0%, rgba(120,210,255,0) 70%);
+      filter:blur(52px);
+      opacity:.34;
+      transition:1.1s ease;
+      background:radial-gradient(circle, rgba(120,210,255,.38) 0%, rgba(120,210,255,0) 72%);
     }
 
     .orb{
       position:relative;
-      width:250px;
-      height:250px;
+      width:232px;
+      height:232px;
       border-radius:50%;
       display:flex;
       align-items:center;
       justify-content:center;
-      transition:transform .85s ease, box-shadow .35s ease, background .2s linear;
+      transition:
+        transform 1.35s ease-in-out,
+        box-shadow 1.1s ease-in-out,
+        background 1.0s linear;
       border:1px solid rgba(255,255,255,.14);
       overflow:hidden;
       box-shadow:
-        inset -18px -24px 40px rgba(0,0,0,.22),
-        inset 14px 16px 28px rgba(255,255,255,.14),
-        0 0 48px rgba(255,255,255,.16);
+        inset -16px -18px 34px rgba(0,0,0,.18),
+        inset 12px 14px 24px rgba(255,255,255,.12),
+        0 0 34px rgba(255,255,255,.10);
     }
 
     .orb:before{
@@ -580,17 +642,17 @@
       inset:0;
       border-radius:50%;
       background:
-        radial-gradient(circle at 30% 24%, rgba(255,255,255,.48) 0%, rgba(255,255,255,.16) 20%, transparent 34%),
-        radial-gradient(circle at 36% 36%, rgba(255,255,255,.08), transparent 58%);
+        radial-gradient(circle at 31% 25%, rgba(255,255,255,.42) 0%, rgba(255,255,255,.12) 21%, transparent 34%),
+        radial-gradient(circle at 38% 38%, rgba(255,255,255,.06), transparent 58%);
       pointer-events:none;
     }
 
     .orb:after{
       content:"";
       position:absolute;
-      bottom:-18px;
-      width:22px;
-      height:28px;
+      bottom:-16px;
+      width:20px;
+      height:24px;
       background:rgba(255,255,255,.10);
       clip-path:polygon(50% 100%, 0 0, 100% 0);
       filter:drop-shadow(0 4px 4px rgba(0,0,0,.18));
@@ -599,10 +661,10 @@
     .orb-center{
       position:relative;
       z-index:2;
-      width:158px;
-      height:158px;
+      width:150px;
+      height:150px;
       border-radius:50%;
-      background:rgba(7,17,31,.58);
+      background:rgba(7,17,31,.54);
       border:1px solid rgba(255,255,255,.10);
       display:flex;
       flex-direction:column;
@@ -613,25 +675,25 @@
     }
 
     .phase{
-      font-size:15px;
-      color:#dcecff;
-      margin-bottom:8px;
-      text-transform:uppercase;
+      font-size:16px;
+      color:#e2f1fb;
+      margin-bottom:6px;
       letter-spacing:2px;
       font-weight:700;
+      text-transform:uppercase;
     }
 
     .count{
-      font-size:62px;
+      font-size:40px;
       line-height:1;
       font-weight:800;
-      margin-bottom:8px;
+      margin-bottom:6px;
     }
 
     .prompt{
-      font-size:15px;
+      font-size:13px;
       font-weight:700;
-      color:#f4fbff;
+      color:#d4e7f6;
     }
 
     .progress-wrap{
@@ -661,7 +723,7 @@
       width:0%;
       background:linear-gradient(90deg, #ef4444, #22c55e, #60a5fa);
       border-radius:999px;
-      transition:width .35s linear;
+      transition:width .5s linear;
     }
 
     .mini-grid{
@@ -692,7 +754,7 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      transition:.35s ease;
+      transition:.6s ease;
       background:conic-gradient(rgba(255,255,255,.12) 0deg, rgba(255,255,255,.08) 0deg);
     }
 
@@ -760,9 +822,9 @@
       .timer-panel{ grid-template-columns:1fr; }
       .session-meta{ grid-template-columns:1fr; }
       .orb-wrap{ width:310px; height:310px; }
-      .orb{ width:215px; height:215px; }
-      .orb-center{ width:138px; height:138px; }
-      .count{ font-size:50px; }
+      .orb{ width:208px; height:208px; }
+      .orb-center{ width:134px; height:134px; }
+      .count{ font-size:34px; }
       .mini-grid{ grid-template-columns:1fr; }
       .time-preset-grid{ grid-template-columns:repeat(4, 1fr); }
     }
@@ -770,15 +832,23 @@
 </head>
 <body>
   <div class="bg">
+    <div class="sun-halo"></div>
     <div class="sun"></div>
-    <div class="mist m1"></div>
-    <div class="mist m2"></div>
-    <div class="mist m3"></div>
-    <div class="mist m4"></div>
-    <div class="ripple"></div>
-    <div class="ripple r2"></div>
-    <div class="ripple r3"></div>
-    <div class="grain"></div>
+    <div class="mist mist1"></div>
+    <div class="mist mist2"></div>
+    <div class="mist mist3"></div>
+    <div class="mist mist4"></div>
+    <div class="ripple-wrap">
+      <div class="ripple"></div>
+      <div class="ripple r2"></div>
+      <div class="ripple r3"></div>
+    </div>
+    <div class="particles" id="particles"></div>
+    <div class="mountains">
+      <div class="mountain back"></div>
+      <div class="mountain mid"></div>
+      <div class="mountain front"></div>
+    </div>
   </div>
 
   <div class="app">
@@ -787,7 +857,7 @@
         <div class="logo"></div>
         <div>
           <h1>Breathora</h1>
-          <div class="sub">Guided breathing to reduce stress, improve focus, and help you relax.</div>
+          <div class="sub">Guided breathing to reduce stress, ease anxiety, stay focused, and restore calm.</div>
         </div>
       </div>
 
@@ -823,7 +893,7 @@
           <input type="checkbox" id="voiceToggle" checked />
         </div>
         <div class="audio-row">
-          <span>Beep on phase change</span>
+          <span>Ticks and tones</span>
           <input type="checkbox" id="beepToggle" checked />
         </div>
       </div>
@@ -929,12 +999,12 @@
 
       <div class="support">
         <h3>Optional Support</h3>
-        <p>If this app helps you feel calmer, support future improvements.</p>
+        <p>If you find this app beneficial, please consider donating to support future improvements.</p>
         <a href="https://venmo.com/Breathora" target="_blank" rel="noopener">Donate</a>
       </div>
 
       <div class="footer-note" id="techniqueDesc">
-        Balanced breathing for calm and control.
+        Balanced breathing to reduce stress, sharpen focus, and create calm.
       </div>
     </div>
   </div>
@@ -946,7 +1016,7 @@
         name: "Box Breathing",
         tag: "Calming",
         pattern: "4 in • 4 hold • 4 out • 4 hold",
-        description: "Balanced breathing for calm and control.",
+        description: "Balanced breathing to reduce stress, sharpen focus, and create calm.",
         phases: [
           { name: "Inhale", seconds: 4, type: "inhale" },
           { name: "Hold", seconds: 4, type: "hold" },
@@ -959,7 +1029,7 @@
         name: "4-6 Relax",
         tag: "De-Stress",
         pattern: "4 in • 6 out",
-        description: "Longer exhale helps settle the system.",
+        description: "Longer exhales help settle the nervous system.",
         phases: [
           { name: "Inhale", seconds: 4, type: "inhale" },
           { name: "Exhale", seconds: 6, type: "exhale" }
@@ -970,7 +1040,7 @@
         name: "Focus Reset",
         tag: "Focus",
         pattern: "4 in • 2 hold • 4 out",
-        description: "Simple reset when your head feels busy.",
+        description: "A simple breathing reset when the mind feels scattered.",
         phases: [
           { name: "Inhale", seconds: 4, type: "inhale" },
           { name: "Hold", seconds: 2, type: "hold" },
@@ -982,7 +1052,7 @@
         name: "Deep Calm",
         tag: "Sleepy / Calm",
         pattern: "4 in • 7 hold • 8 out",
-        description: "Slow breathing for deeper relaxation.",
+        description: "Slower breathing designed for deeper relaxation.",
         phases: [
           { name: "Inhale", seconds: 4, type: "inhale" },
           { name: "Hold", seconds: 7, type: "hold" },
@@ -992,9 +1062,9 @@
       {
         id: "physiological",
         name: "Physiological Sigh",
-        tag: "Vagus Nerve",
+        tag: "Reset",
         pattern: "3 in • 1 top-up • 6 out",
-        description: "Fast reset when you feel wound up.",
+        description: "A fast nervous-system reset when you feel keyed up.",
         phases: [
           { name: "Inhale", seconds: 3, type: "inhale" },
           { name: "Top-Up", seconds: 1, type: "inhale2" },
@@ -1006,7 +1076,7 @@
         name: "Wake Up",
         tag: "Energy",
         pattern: "6 in • 2 hold • 4 out",
-        description: "A little more inhale to wake you up without rushing.",
+        description: "A slightly bigger inhale to wake you up without rushing.",
         phases: [
           { name: "Inhale", seconds: 6, type: "inhale" },
           { name: "Hold", seconds: 2, type: "hold" },
@@ -1020,6 +1090,7 @@
     let phaseRemaining = selectedTechnique.phases[0].seconds;
     let breathTimer = null;
     let sessionTimer = null;
+    let tickTimer = null;
     let cyclesCompleted = 0;
     let isRunning = false;
     let audioCtx = null;
@@ -1053,6 +1124,21 @@
     const sessionCompleteText = document.getElementById("sessionCompleteText");
     const customMinutes = document.getElementById("customMinutes");
     const timePresetGrid = document.getElementById("timePresetGrid");
+    const particles = document.getElementById("particles");
+
+    function buildParticles() {
+      for (let i = 0; i < 24; i++) {
+        const p = document.createElement("div");
+        p.className = "particle";
+        p.style.left = `${Math.random() * 100}%`;
+        p.style.top = `${58 + Math.random() * 34}%`;
+        p.style.animationDuration = `${8 + Math.random() * 10}s`;
+        p.style.animationDelay = `${Math.random() * 8}s`;
+        p.style.opacity = `${0.2 + Math.random() * 0.5}`;
+        p.style.transform = `scale(${0.8 + Math.random() * 1.6})`;
+        particles.appendChild(p);
+      }
+    }
 
     function formatTime(seconds) {
       const mins = Math.floor(seconds / 60);
@@ -1183,29 +1269,27 @@
     function getOrbStyle(type, progress) {
       if (type === "inhale") {
         const hue = getInhaleHue(progress);
-        return { hue, sat: 82, light: 52, scale: 0.90 + (progress * 0.30), glowAlpha: 0.28 + (progress * 0.28) };
+        return { hue, sat: 74, light: 56, scale: 0.96 + (progress * 0.12), glowAlpha: 0.18 + (progress * 0.16) };
       }
 
       if (type === "inhale2") {
-        return { hue: 220, sat: 88, light: 58, scale: 1.18 + (progress * 0.05), glowAlpha: 0.55 };
+        return { hue: 220, sat: 78, light: 58, scale: 1.08, glowAlpha: 0.30 };
       }
 
       if (type === "hold") {
         const hue = getHoldHue(progress);
         holdEndHue = getHoldHue(1);
-        return { hue, sat: 84, light: 54, scale: 1.18, glowAlpha: 0.42 };
+        return { hue, sat: 76, light: 56, scale: 1.08, glowAlpha: 0.24 };
       }
 
       if (type === "exhale") {
         const previous = getPreviousPhase();
         const startHue = previous && previous.type === "hold" ? holdEndHue : 220;
         const hue = startHue - (progress * startHue);
-        const sat = 82;
-        const light = 52 - (progress * 12);
-        return { hue, sat, light, scale: 1.16 - (progress * 0.30), glowAlpha: 0.34 - (progress * 0.16) };
+        return { hue, sat: 74, light: 52 - (progress * 8), scale: 1.08 - (progress * 0.12), glowAlpha: 0.24 - (progress * 0.10) };
       }
 
-      return { hue: 210, sat: 80, light: 50, scale: 1, glowAlpha: 0.35 };
+      return { hue: 210, sat: 70, light: 54, scale: 1, glowAlpha: 0.20 };
     }
 
     function updateOrbVisual() {
@@ -1215,16 +1299,16 @@
 
       orb.style.transform = `scale(${c.scale})`;
       orb.style.background = `
-        radial-gradient(circle at 50% ${100 - (progress * 68)}%, rgba(255,255,255,.12), transparent 55%),
-        linear-gradient(180deg, hsla(${c.hue}, ${c.sat}%, ${c.light + 8}%, .98), hsla(${c.hue}, ${c.sat}%, ${c.light - 10}%, .98))
+        radial-gradient(circle at 50% ${100 - (progress * 44)}%, rgba(255,255,255,.10), transparent 56%),
+        linear-gradient(180deg, hsla(${c.hue}, ${c.sat}%, ${c.light + 6}%, .96), hsla(${c.hue}, ${c.sat}%, ${c.light - 8}%, .96))
       `;
       orb.style.boxShadow = `
-        inset -16px -24px 45px rgba(0,0,0,.24),
-        inset 14px 16px 28px rgba(255,255,255,.12),
-        0 0 55px hsla(${c.hue}, ${c.sat}%, ${c.light}%, ${c.glowAlpha})
+        inset -16px -24px 36px rgba(0,0,0,.18),
+        inset 12px 14px 24px rgba(255,255,255,.12),
+        0 0 44px hsla(${c.hue}, ${c.sat}%, ${c.light}%, ${c.glowAlpha})
       `;
       glow.style.opacity = c.glowAlpha;
-      glow.style.background = `radial-gradient(circle, hsla(${c.hue}, ${c.sat}%, ${c.light}%, .45) 0%, hsla(${c.hue}, ${c.sat}%, ${c.light}%, 0) 70%)`;
+      glow.style.background = `radial-gradient(circle, hsla(${c.hue}, ${c.sat}%, ${c.light}%, .34) 0%, hsla(${c.hue}, ${c.sat}%, ${c.light}%, 0) 74%)`;
     }
 
     function updateSessionProgress() {
@@ -1246,7 +1330,7 @@
       const current = getCurrentPhase();
       phaseLabel.textContent = current.name.toUpperCase();
       countLabel.textContent = phaseRemaining;
-      promptLabel.textContent = current.type === "inhale2" ? "Quick top-up" : current.name;
+      promptLabel.textContent = current.type === "inhale2" ? "Soft reset breath" : "Close your eyes and follow";
       techniqueName.textContent = selectedTechnique.name;
       techniqueDesc.textContent = selectedTechnique.description;
       selectedTechniqueLabel.textContent = selectedTechnique.name;
@@ -1268,7 +1352,7 @@
       if (audioCtx.state === "suspended") audioCtx.resume();
     }
 
-    function playBeep(freq = 520, duration = 0.14, vol = 0.08) {
+    function playTone(freq = 520, duration = 0.14, vol = 0.05, type = "sine") {
       if (!beepToggle.checked) return;
       ensureAudio();
 
@@ -1276,7 +1360,7 @@
       const gain = audioCtx.createGain();
       const now = audioCtx.currentTime;
 
-      osc.type = "sine";
+      osc.type = type;
       osc.frequency.value = freq;
 
       gain.gain.value = 0.0001;
@@ -1287,15 +1371,26 @@
       gain.gain.linearRampToValueAtTime(0.0001, now + duration);
 
       osc.start(now);
-      osc.stop(now + duration + 0.02);
+      osc.stop(now + duration + 0.04);
+    }
+
+    function playTick() {
+      playTone(880, 0.08, 0.035, "triangle");
+    }
+
+    function playPhaseTone(type) {
+      if (type === "inhale") playTone(540, 0.16, 0.05, "sine");
+      else if (type === "hold") playTone(660, 0.14, 0.045, "triangle");
+      else if (type === "exhale") playTone(420, 0.16, 0.05, "sine");
+      else playTone(700, 0.10, 0.04, "triangle");
     }
 
     function playEndChime() {
       if (!beepToggle.checked) return;
       ensureAudio();
-      playBeep(660, 0.12, 0.07);
-      setTimeout(() => playBeep(880, 0.16, 0.08), 160);
-      setTimeout(() => playBeep(1040, 0.22, 0.09), 340);
+      playTone(660, 0.14, 0.05, "sine");
+      setTimeout(() => playTone(820, 0.16, 0.05, "sine"), 180);
+      setTimeout(() => playTone(980, 0.26, 0.06, "sine"), 380);
     }
 
     function speak(text) {
@@ -1305,7 +1400,7 @@
       window.speechSynthesis.cancel();
 
       const utter = new SpeechSynthesisUtterance(text);
-      utter.rate = 0.85;
+      utter.rate = 0.82;
       utter.pitch = 1;
       utter.volume = 1;
 
@@ -1319,22 +1414,33 @@
       window.speechSynthesis.speak(utter);
     }
 
-    function speakPhaseOnly() {
+    function speakPhaseLead() {
       const current = getCurrentPhase();
 
       if (current.type === "inhale2") {
-        speak("Quick inhale");
+        speak("Quick inhale, one");
         return;
       }
 
-      speak(current.name);
+      speak(`${current.name}, ${current.seconds}`);
     }
 
     function stopAllTimers() {
       clearInterval(breathTimer);
       clearInterval(sessionTimer);
+      clearTimeout(tickTimer);
       breathTimer = null;
       sessionTimer = null;
+      tickTimer = null;
+    }
+
+    function scheduleTicks(seconds) {
+      clearTimeout(tickTimer);
+      for (let i = 1; i < seconds; i++) {
+        setTimeout(() => {
+          if (isRunning) playTick();
+        }, i * 1000);
+      }
     }
 
     function completeSession() {
@@ -1361,8 +1467,9 @@
 
         phaseRemaining = selectedTechnique.phases[currentPhaseIndex].seconds;
         updateUI();
-        playBeep();
-        speakPhaseOnly();
+        playPhaseTone(getCurrentPhase().type);
+        speakPhaseLead();
+        scheduleTicks(getCurrentPhase().seconds);
       }
     }
 
@@ -1394,8 +1501,9 @@
       timerSub.textContent = "Session";
 
       updateUI();
-      playBeep();
-      speakPhaseOnly();
+      playPhaseTone(getCurrentPhase().type);
+      speakPhaseLead();
+      scheduleTicks(getCurrentPhase().seconds);
 
       breathTimer = setInterval(stepBreath, 1000);
       sessionTimer = setInterval(stepSession, 1000);
@@ -1465,6 +1573,7 @@
     document.getElementById("pauseBtn").onclick = pauseSession;
     document.getElementById("resetBtn").onclick = () => resetSession();
 
+    buildParticles();
     renderTechniques();
     renderTimeButtons();
     setSessionMinutes(5);
