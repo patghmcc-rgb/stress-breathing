@@ -405,6 +405,14 @@
       display:grid;
     }
 
+    .app-shell.panic-mode{
+      grid-template-columns:1fr;
+    }
+
+    .app-shell.panic-mode .sidebar{
+      display:none;
+    }
+
     .app-shell.work-safe .why-card,
     .app-shell.work-safe .support,
     .app-shell.work-safe .footer-note{
@@ -892,7 +900,6 @@
       max-width:760px;
     }
 
-    /* mobile boost */
     @media (max-width: 768px){
       .page{padding:12px;}
       .eyebrow{font-size:14px;padding:10px 14px;}
@@ -1401,9 +1408,11 @@
 
     async function requestWakeLock() {
       try {
-        if ('wakeLock' in navigator && !wakeLock) {
-          wakeLock = await navigator.wakeLock.request('screen');
-          wakeLock.addEventListener('release', () => { wakeLock = null; });
+        if ("wakeLock" in navigator && !wakeLock) {
+          wakeLock = await navigator.wakeLock.request("screen");
+          wakeLock.addEventListener("release", () => {
+            wakeLock = null;
+          });
         }
       } catch (err) {
         console.log(`Wake Lock error: ${err.name}, ${err.message}`);
@@ -1421,8 +1430,8 @@
       }
     }
 
-    document.addEventListener('visibilitychange', async () => {
-      if (document.visibilityState === 'visible' && isRunning) {
+    document.addEventListener("visibilitychange", async () => {
+      if (document.visibilityState === "visible" && isRunning) {
         await requestWakeLock();
       }
     });
@@ -1431,17 +1440,19 @@
       cover.style.display = "none";
       appShell.classList.add("active");
 
-      setTimeout(() => {
-        appShell.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
-      }, 50);
+      window.scrollTo({
+        top: 0,
+        behavior: "auto"
+      });
+
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
     }
 
     async function showHome() {
       await pauseSession();
       appShell.classList.remove("active");
+      appShell.classList.remove("panic-mode");
       cover.style.display = "grid";
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -1741,17 +1752,28 @@
       if (isSilent() || !voiceToggle.checked) return;
       if (!("speechSynthesis" in window)) return;
 
-      window.speechSynthesis.cancel();
+      const doSpeak = () => {
+        window.speechSynthesis.cancel();
 
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.rate = 0.84;
-      utter.pitch = 1.0;
-      utter.volume = 1;
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.rate = 0.9;
+        utter.pitch = 1.0;
+        utter.volume = 1.0;
 
-      const picked = getSelectedVoice();
-      if (picked) utter.voice = picked;
+        const picked = getSelectedVoice();
+        if (picked) utter.voice = picked;
 
-      window.speechSynthesis.speak(utter);
+        window.speechSynthesis.speak(utter);
+      };
+
+      if (speechSynthesis.getVoices().length === 0) {
+        speechSynthesis.onvoiceschanged = () => {
+          populateVoiceOptions();
+          doSpeak();
+        };
+      } else {
+        doSpeak();
+      }
     }
 
     function speakPhaseOnly() {
@@ -1872,14 +1894,51 @@
       await releaseWakeLock();
     }
 
-    function startFromMode(modeId) {
+    async function startFromMode(modeId) {
+      appShell.classList.remove("panic-mode");
+
       selectTechnique(modeId, true);
       showApp();
-      startSession();
+
+      await resetSession(false);
+      await startSession();
+
+      setTimeout(() => {
+        const orbWrap = document.querySelector(".orb-wrap");
+        if (orbWrap) {
+          orbWrap.scrollIntoView({
+            behavior: "auto",
+            block: "start"
+          });
+        }
+      }, 50);
     }
 
     [...document.querySelectorAll("[data-start-mode]")].forEach(btn => {
-      btn.addEventListener("click", () => startFromMode(btn.dataset.startMode));
+      btn.addEventListener("click", async () => {
+        const mode = btn.dataset.startMode;
+
+        if (mode === "panic") {
+          appShell.classList.add("panic-mode");
+          selectTechnique("panic", true);
+          showApp();
+          await resetSession(false);
+          await startSession();
+
+          window.scrollTo({ top: 0, behavior: "auto" });
+
+          const orbWrap = document.querySelector(".orb-wrap");
+          if (orbWrap) {
+            orbWrap.scrollIntoView({
+              behavior: "auto",
+              block: "start"
+            });
+          }
+          return;
+        }
+
+        startFromMode(mode);
+      });
     });
 
     [...timePresetGrid.querySelectorAll(".time-btn")].forEach(btn => {
@@ -1941,7 +2000,10 @@
       window.speechSynthesis.onvoiceschanged = () => populateVoiceOptions();
     }
 
-    document.getElementById("startBtn").onclick = () => { showApp(); startSession(); };
+    document.getElementById("startBtn").onclick = () => {
+      showApp();
+      startSession();
+    };
     document.getElementById("pauseBtn").onclick = pauseSession;
     document.getElementById("resetBtn").onclick = () => resetSession();
 
