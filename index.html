@@ -215,7 +215,7 @@
       display:grid;
       grid-template-columns:1.1fr .9fr;
       gap:20px;
-      align-items:stretch;
+      align-items:start;
       min-height:calc(100vh - 90px);
     }
 
@@ -235,7 +235,7 @@
       padding:34px;
       display:flex;
       flex-direction:column;
-      justify-content:center;
+      justify-content:flex-start;
       background:rgba(8,16,24,.40);
     }
 
@@ -279,7 +279,7 @@
       display:flex;
       gap:14px;
       flex-wrap:wrap;
-      margin-bottom:20px;
+      margin-bottom:16px;
     }
 
     .primary-cta{
@@ -295,8 +295,8 @@
     }
 
     .secondary-cta{
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.06);
+      border:2px solid rgba(154,216,255,.30);
+      background:rgba(255,255,255,.08);
       color:var(--text);
       border-radius:20px;
       padding:18px 24px;
@@ -305,21 +305,36 @@
       cursor:pointer;
     }
 
+    .hero-help{
+      margin:6px 0 18px;
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.45;
+    }
+
     .mode-strip{
       display:grid;
       grid-template-columns:repeat(3,1fr);
       gap:12px;
-      margin-top:14px;
+      margin-top:6px;
     }
 
     .mode-tile{
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.05);
-      border-radius:18px;
-      padding:16px;
+      border:2px solid rgba(154,216,255,.30);
+      background:rgba(255,255,255,.06);
+      border-radius:22px;
+      padding:18px;
       cursor:pointer;
       min-height:112px;
       color:var(--text);
+      transition:.2s ease;
+    }
+
+    .mode-tile:active,
+    .mode-tile:hover{
+      transform:translateY(-2px);
+      border-color:#9ad8ff;
+      box-shadow:0 0 22px rgba(154,216,255,.18);
     }
 
     .mode-tile strong{
@@ -363,8 +378,9 @@
     .benefit{
       padding:14px 16px;
       border-radius:18px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.025);
+      cursor:default;
     }
 
     .benefit strong{
@@ -878,36 +894,49 @@
 
     /* mobile boost */
     @media (max-width: 768px){
-      body{font-size:18px;}
-      .page{padding:14px;}
-      .title{font-size:34px;line-height:1.05;}
-      .subtitle{font-size:18px;line-height:1.5;}
-      .primary-cta,.secondary-cta,.btn,.ghost-btn{
-        font-size:18px;
+      .page{padding:12px;}
+      .eyebrow{font-size:14px;padding:10px 14px;}
+      .title{font-size:40px;line-height:1.08;}
+      .subtitle{font-size:21px;line-height:1.55;}
+      .hero-help{font-size:16px;line-height:1.5;}
+      .mode-tile strong{font-size:21px;}
+      .mode-tile span{font-size:17px;line-height:1.5;}
+      .summary-card h3{font-size:24px;}
+      .summary-card p,.benefit span{font-size:17px;line-height:1.55;}
+      .benefit strong{font-size:18px;}
+      .ghost-btn,.primary-cta,.secondary-cta,.btn{
+        font-size:19px;
+        min-height:58px;
         padding:16px 18px;
-        min-height:56px;
       }
-      .preset-name{font-size:20px;}
-      .preset-pattern{font-size:16px;}
-      .preset-desc{font-size:15px;line-height:1.45;}
-      .section-title{font-size:18px;}
-      .label,.toggle-row{font-size:16px;}
-      input,select{font-size:18px;min-height:52px;}
-      .phase{font-size:20px;}
-      .count{font-size:52px;}
-      .prompt{font-size:16px;}
-      .timer-value{font-size:42px;}
-      .meta-pill .v,.stat-value{font-size:26px;}
-      .meta-pill .k,.stat-label{font-size:13px;}
-      .why-card p,.footer-note,.mini small{font-size:15px;line-height:1.5;}
-      .orb{width:240px;height:240px;}
-      .orb-center{width:150px;height:150px;}
-      .timer-orb{width:220px;height:220px;}
+      .sub{font-size:16px;line-height:1.5;}
+      .preset-name{font-size:22px;}
+      .preset-tag{font-size:13px;}
+      .preset-pattern{font-size:17px;}
+      .preset-desc{font-size:16px;line-height:1.5;}
+      .section-title{font-size:20px;}
+      .label,.toggle-row{font-size:17px;}
+      input[type="number"],select{font-size:19px;min-height:56px;}
+      .time-btn{font-size:17px;min-height:52px;}
+      .stat-label,.meta-pill .k,.timer-label{font-size:14px;}
+      .stat-value,.meta-pill .v{font-size:28px;}
+      .timer-value{font-size:46px;}
+      .timer-sub{font-size:16px;}
+      .phase{font-size:22px;}
+      .count{font-size:58px;}
+      .prompt{font-size:17px;}
+      .mini h3,.why-card h3,.support h3{font-size:22px;}
+      .mini small,.why-card p,.support p,.footer-note{font-size:17px;line-height:1.55;}
+      .orb-wrap{width:330px;height:330px;}
+      .orb{width:250px;height:250px;}
+      .orb-center{width:160px;height:160px;}
+      .timer-orb{width:230px;height:230px;}
     }
 
     @media (max-width: 1100px){
       .cover{grid-template-columns:1fr;}
       .app-shell{grid-template-columns:1fr;}
+      .cover-side{order:3;}
     }
 
     @media (max-width: 980px){
@@ -963,6 +992,8 @@
           <button class="primary-cta" data-start-mode="panic">Calm Me Now</button>
           <button class="secondary-cta" data-start-mode="manager">2-Minute Manager Reset</button>
         </div>
+
+        <div class="hero-help">Pick one and it drops you straight into the breathing screen.</div>
 
         <div class="mode-strip">
           <button class="mode-tile" data-start-mode="box">
@@ -1399,7 +1430,13 @@
     function showApp() {
       cover.style.display = "none";
       appShell.classList.add("active");
-      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      setTimeout(() => {
+        appShell.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      }, 50);
     }
 
     async function showHome() {
