@@ -13,13 +13,12 @@
       --bg-bottom:#467679;
       --text:#eef6fb;
       --muted:#c4d4de;
-      --card:rgba(8,16,24,.24);
+      --card:rgba(8,16,24,.22);
       --line:rgba(255,255,255,.10);
       --shadow:0 24px 70px rgba(0,0,0,.28);
       --btn:#9ad8ff;
       --btn-text:#062135;
       --accent:#8fd3ff;
-      --accent-2:#f3c979;
     }
 
     body.light{
@@ -35,7 +34,6 @@
       --btn:#2d88b8;
       --btn-text:#f5fbff;
       --accent:#2d88b8;
-      --accent-2:#b9822d;
     }
 
     *{box-sizing:border-box}
@@ -192,22 +190,18 @@
       0%,100%{transform:translateX(-50%) scale(1);opacity:.92;}
       50%{transform:translateX(-50%) scale(1.04);opacity:1;}
     }
-
     @keyframes cloudDrift{
       from{transform:translateX(0);}
       to{transform:translateX(150vw);}
     }
-
     @keyframes mistFloat{
       from{transform:translate(0,0) scale(1);}
       to{transform:translate(32px,-18px) scale(1.10);}
     }
-
     @keyframes ripple{
       0%{transform:scale(.70);opacity:.22;}
       100%{transform:scale(5);opacity:0;}
     }
-
     @keyframes particleFloat{
       0%{transform:translateY(0) translateX(0);opacity:0;}
       12%{opacity:1;}
@@ -339,6 +333,7 @@
       padding:16px;
       cursor:pointer;
       min-height:112px;
+      color:var(--text);
     }
 
     .mode-tile strong{
@@ -406,6 +401,16 @@
 
     .app-shell.active{
       display:grid;
+    }
+
+    .app-shell.work-safe .why-card,
+    .app-shell.work-safe .support,
+    .app-shell.work-safe .footer-note{
+      display:none;
+    }
+
+    .app-shell.work-safe .content-grid{
+      grid-template-columns:1fr;
     }
 
     .sidebar{
@@ -1019,7 +1024,7 @@
           <p>
             Longer exhales can help activate the body’s calming response.
             Steady breathing can reduce the feeling of mental chaos and help you regain control.
-            The goal here is simple: help your body stop acting like it’s under attack.
+            The goal is simple: help your body stop acting like it’s under attack.
           </p>
         </div>
       </div>
@@ -1077,6 +1082,10 @@
           <div class="toggle-row">
             <span>Vibration</span>
             <input type="checkbox" id="vibrationToggle" />
+          </div>
+          <div class="toggle-row">
+            <span>Work-Safe mode</span>
+            <input type="checkbox" id="workSafeToggle" />
           </div>
         </div>
 
@@ -1320,6 +1329,7 @@
     let totalSessionSeconds = selectedMinutes * 60;
     let sessionSecondsRemaining = selectedMinutes * 60;
     let availableVoices = [];
+    let wakeLock = null;
 
     const cover = document.getElementById("cover");
     const appShell = document.getElementById("appShell");
@@ -1340,6 +1350,7 @@
     const beepToggle = document.getElementById("beepToggle");
     const silentToggle = document.getElementById("silentToggle");
     const vibrationToggle = document.getElementById("vibrationToggle");
+    const workSafeToggle = document.getElementById("workSafeToggle");
     const timerValue = document.getElementById("timerValue");
     const timerSub = document.getElementById("timerSub");
     const timerOrb = document.getElementById("timerOrb");
@@ -1371,6 +1382,36 @@
         particles.appendChild(p);
       }
     }
+
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator && !wakeLock) {
+          wakeLock = await navigator.wakeLock.request('screen');
+          wakeLock.addEventListener('release', () => {
+            wakeLock = null;
+          });
+        }
+      } catch (err) {
+        console.log(`Wake Lock error: ${err.name}, ${err.message}`);
+      }
+    }
+
+    async function releaseWakeLock() {
+      try {
+        if (wakeLock) {
+          await wakeLock.release();
+          wakeLock = null;
+        }
+      } catch (err) {
+        console.log(`Wake Lock release error: ${err.name}, ${err.message}`);
+      }
+    }
+
+    document.addEventListener('visibilitychange', async () => {
+      if (document.visibilityState === 'visible' && isRunning) {
+        await requestWakeLock();
+      }
+    });
 
     function showApp() {
       cover.style.display = "none";
@@ -1439,9 +1480,7 @@
       const found = techniques.find(t => t.id === id);
       if (!found) return;
       selectedTechnique = found;
-      if (resetTime) {
-        setSessionMinutes(found.defaultMinutes);
-      }
+      if (resetTime) setSessionMinutes(found.defaultMinutes);
       resetSession(false);
       renderTechniques();
       updateUI();
@@ -1619,7 +1658,7 @@
       navigator.vibrate(pattern);
     }
 
-    function playTone(freq = 520, duration = 0.14, vol = 0.05, type = "sine") {
+    function playTone(freq = 440, duration = 0.14, vol = 0.05, type = "sine") {
       if (isSilent() || !beepToggle.checked) return;
       ensureAudio();
 
@@ -1641,16 +1680,18 @@
       osc.stop(now + duration + 0.04);
     }
 
-    function playTick() {
-      playTone(880, 0.08, 0.03, "triangle");
+    function playTick(phaseType = "inhale") {
+      if (phaseType === "exhale") playTone(220, 0.08, 0.03, "sine");
+      else if (phaseType === "hold") playTone(330, 0.08, 0.028, "triangle");
+      else playTone(440, 0.08, 0.03, "triangle");
       vibrate(18);
     }
 
     function playPhaseTone(type) {
-      if (type === "inhale") playTone(540, 0.16, 0.045, "sine");
-      else if (type === "hold") playTone(660, 0.14, 0.040, "triangle");
-      else if (type === "exhale") playTone(420, 0.16, 0.045, "sine");
-      else playTone(700, 0.10, 0.035, "triangle");
+      if (type === "inhale") playTone(440, 0.16, 0.04, "sine");
+      else if (type === "hold") playTone(330, 0.14, 0.035, "triangle");
+      else if (type === "exhale") playTone(220, 0.18, 0.04, "sine");
+      else playTone(440, 0.10, 0.03, "triangle");
 
       if (type === "inhale") vibrate([35]);
       if (type === "hold") vibrate([20, 40, 20]);
@@ -1660,9 +1701,9 @@
     function playEndChime() {
       if (isSilent() || !beepToggle.checked) return;
       ensureAudio();
-      playTone(660, 0.14, 0.05, "sine");
-      setTimeout(() => playTone(820, 0.16, 0.05, "sine"), 180);
-      setTimeout(() => playTone(980, 0.26, 0.06, "sine"), 380);
+      playTone(330, 0.14, 0.05, "sine");
+      setTimeout(() => playTone(440, 0.16, 0.05, "sine"), 180);
+      setTimeout(() => playTone(520, 0.26, 0.05, "sine"), 380);
       vibrate([40, 70, 40]);
     }
 
@@ -1720,15 +1761,15 @@
       sessionTimer = null;
     }
 
-    function scheduleTicks(seconds) {
+    function scheduleTicks(seconds, phaseType) {
       for (let i = 1; i < seconds; i++) {
         setTimeout(() => {
-          if (isRunning) playTick();
+          if (isRunning) playTick(phaseType);
         }, i * 1000);
       }
     }
 
-    function completeSession() {
+    async function completeSession() {
       stopAllTimers();
       isRunning = false;
       stateEl.textContent = "Complete";
@@ -1736,6 +1777,7 @@
       timerSub.textContent = "Complete";
       playEndChime();
       speak("Session complete");
+      await releaseWakeLock();
     }
 
     function stepBreath() {
@@ -1752,9 +1794,10 @@
 
         phaseRemaining = selectedTechnique.phases[currentPhaseIndex].seconds;
         updateUI();
-        playPhaseTone(getCurrentPhase().type);
+        const phaseType = getCurrentPhase().type;
+        playPhaseTone(phaseType);
         speakPhaseOnly();
-        scheduleTicks(getCurrentPhase().seconds);
+        scheduleTicks(getCurrentPhase().seconds, phaseType);
       }
     }
 
@@ -1769,7 +1812,7 @@
       }
     }
 
-    function startSession() {
+    async function startSession() {
       if (isRunning) return;
 
       const customVal = Number(customMinutes.value);
@@ -1780,29 +1823,32 @@
       }
 
       ensureAudio();
+      await requestWakeLock();
       isRunning = true;
       stateEl.textContent = "Running";
       sessionCompleteText.textContent = "";
       timerSub.textContent = "Session";
 
       updateUI();
-      playPhaseTone(getCurrentPhase().type);
+      const phaseType = getCurrentPhase().type;
+      playPhaseTone(phaseType);
       speakPhaseOnly();
-      scheduleTicks(getCurrentPhase().seconds);
+      scheduleTicks(getCurrentPhase().seconds, phaseType);
 
       breathTimer = setInterval(stepBreath, 1000);
       sessionTimer = setInterval(stepSession, 1000);
     }
 
-    function pauseSession() {
+    async function pauseSession() {
       isRunning = false;
       stopAllTimers();
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
       stateEl.textContent = "Paused";
       timerSub.textContent = "Paused";
+      await releaseWakeLock();
     }
 
-    function resetSession(render = true) {
+    async function resetSession(render = true) {
       stopAllTimers();
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
 
@@ -1818,6 +1864,7 @@
       if (render) renderTechniques();
       updateUI();
       stateEl.textContent = "Ready";
+      await releaseWakeLock();
     }
 
     function startFromMode(modeId) {
@@ -1873,6 +1920,10 @@
 
     beepToggle.addEventListener("change", () => {
       if (beepToggle.checked) silentToggle.checked = false;
+    });
+
+    workSafeToggle.addEventListener("change", () => {
+      appShell.classList.toggle("work-safe", workSafeToggle.checked);
     });
 
     themeBtn.addEventListener("click", () => {
