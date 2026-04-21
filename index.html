@@ -58,40 +58,39 @@
 
     .sun-halo{
       position:absolute;
-      width:640px;
-      height:640px;
-      left:28%;
-      top:2%;
+      width:560px;
+      height:560px;
+      left:18%;
+      top:0%;
       transform:translateX(-50%);
       border-radius:50%;
       background:radial-gradient(circle,
-        rgba(255,228,170,.56) 0%,
-        rgba(255,190,110,.30) 30%,
-        rgba(255,160,90,.12) 52%,
+        rgba(255,228,170,.30) 0%,
+        rgba(255,190,110,.16) 32%,
+        rgba(255,160,90,.06) 54%,
         rgba(255,160,90,0) 76%);
-      filter:blur(18px);
+      filter:blur(22px);
       animation:sunBreath 14s ease-in-out infinite;
     }
 
     .sun{
       position:absolute;
-      width:160px;
-      height:160px;
-      left:28%;
-      top:9%;
+      width:130px;
+      height:130px;
+      left:18%;
+      top:8%;
       transform:translateX(-50%);
       border-radius:50%;
       background:radial-gradient(circle at 40% 34%,
-        rgba(255,252,238,1) 0%,
-        rgba(255,240,190,.99) 16%,
-        rgba(255,220,145,.98) 40%,
-        rgba(255,188,104,.96) 72%,
-        rgba(255,162,88,.94) 100%);
+        rgba(255,252,238,.96) 0%,
+        rgba(255,240,190,.92) 18%,
+        rgba(255,220,145,.86) 42%,
+        rgba(255,188,104,.78) 74%,
+        rgba(255,162,88,.72) 100%);
       box-shadow:
-        0 0 24px rgba(255,225,150,.42),
-        0 0 72px rgba(255,190,110,.24),
-        0 0 130px rgba(255,170,95,.12);
-      opacity:1;
+        0 0 16px rgba(255,225,150,.18),
+        0 0 42px rgba(255,190,110,.10);
+      opacity:.72;
     }
 
     .cloud{
@@ -221,11 +220,15 @@
     }
 
     .panel{
-      background:var(--card);
+      background:rgba(8,16,24,.34);
       border:1px solid var(--line);
       border-radius:30px;
       box-shadow:var(--shadow);
-      backdrop-filter:blur(16px);
+      backdrop-filter:blur(18px);
+    }
+
+    body.light .panel{
+      background:rgba(255,255,255,.62);
     }
 
     .hero{
@@ -233,6 +236,11 @@
       display:flex;
       flex-direction:column;
       justify-content:center;
+      background:rgba(8,16,24,.40);
+    }
+
+    body.light .hero{
+      background:rgba(255,255,255,.72);
     }
 
     .eyebrow{
@@ -255,6 +263,7 @@
       line-height:.95;
       margin:0 0 16px;
       max-width:700px;
+      text-shadow:0 2px 18px rgba(0,0,0,.28);
     }
 
     .subtitle{
@@ -263,6 +272,7 @@
       font-size:18px;
       line-height:1.55;
       margin:0 0 26px;
+      text-shadow:0 1px 10px rgba(0,0,0,.18);
     }
 
     .cta-row{
@@ -866,13 +876,41 @@
       max-width:760px;
     }
 
+    /* mobile boost */
+    @media (max-width: 768px){
+      body{font-size:18px;}
+      .page{padding:14px;}
+      .title{font-size:34px;line-height:1.05;}
+      .subtitle{font-size:18px;line-height:1.5;}
+      .primary-cta,.secondary-cta,.btn,.ghost-btn{
+        font-size:18px;
+        padding:16px 18px;
+        min-height:56px;
+      }
+      .preset-name{font-size:20px;}
+      .preset-pattern{font-size:16px;}
+      .preset-desc{font-size:15px;line-height:1.45;}
+      .section-title{font-size:18px;}
+      .label,.toggle-row{font-size:16px;}
+      input,select{font-size:18px;min-height:52px;}
+      .phase{font-size:20px;}
+      .count{font-size:52px;}
+      .prompt{font-size:16px;}
+      .timer-value{font-size:42px;}
+      .meta-pill .v,.stat-value{font-size:26px;}
+      .meta-pill .k,.stat-label{font-size:13px;}
+      .why-card p,.footer-note,.mini small{font-size:15px;line-height:1.5;}
+      .orb{width:240px;height:240px;}
+      .orb-center{width:150px;height:150px;}
+      .timer-orb{width:220px;height:220px;}
+    }
+
     @media (max-width: 1100px){
       .cover{grid-template-columns:1fr;}
       .app-shell{grid-template-columns:1fr;}
     }
 
     @media (max-width: 980px){
-      .title{font-size:42px;}
       .mode-strip{grid-template-columns:1fr;}
       .timer-panel{grid-template-columns:1fr;}
       .session-meta{grid-template-columns:1fr;}
@@ -907,6 +945,7 @@
 
   <div class="page">
     <div class="toolbar">
+      <button class="ghost-btn" id="homeBtn">Menu</button>
       <button class="ghost-btn" id="themeBtn">Light Mode</button>
       <button class="ghost-btn" id="fullscreenBtn">Fullscreen</button>
     </div>
@@ -1312,6 +1351,7 @@
     const bestUseText = document.getElementById("bestUseText");
     const themeBtn = document.getElementById("themeBtn");
     const fullscreenBtn = document.getElementById("fullscreenBtn");
+    const homeBtn = document.getElementById("homeBtn");
 
     function buildParticles() {
       particles.innerHTML = "";
@@ -1359,6 +1399,13 @@
     function showApp() {
       cover.style.display = "none";
       appShell.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function showHome() {
+      await pauseSession();
+      appShell.classList.remove("active");
+      cover.style.display = "grid";
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
@@ -1850,6 +1897,8 @@
         else await document.exitFullscreen();
       } catch (e) {}
     });
+
+    homeBtn.addEventListener("click", showHome);
 
     if ("speechSynthesis" in window) {
       window.speechSynthesis.onvoiceschanged = () => populateVoiceOptions();
