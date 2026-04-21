@@ -405,14 +405,6 @@
       display:grid;
     }
 
-    .app-shell.panic-mode{
-      grid-template-columns:1fr;
-    }
-
-    .app-shell.panic-mode .sidebar{
-      display:none;
-    }
-
     .app-shell.work-safe .why-card,
     .app-shell.work-safe .support,
     .app-shell.work-safe .footer-note{
@@ -635,36 +627,6 @@
       grid-template-columns:210px 1fr;
       gap:18px;
       align-items:center;
-    }
-
-    .panic-controls{
-      display:none;
-    }
-
-    .app-shell.panic-mode .panic-controls{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:center;
-      width:100%;
-      max-width:760px;
-      margin-top:-6px;
-    }
-
-    .panic-chip{
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.08);
-      color:var(--text);
-      border-radius:999px;
-      padding:10px 14px;
-      font-size:14px;
-      font-weight:700;
-      cursor:pointer;
-    }
-
-    .panic-chip.active{
-      border-color:#9ad8ff;
-      box-shadow:0 0 0 1px rgba(154,216,255,.18) inset;
     }
 
     .timer-orb{
@@ -930,6 +892,7 @@
       max-width:760px;
     }
 
+    /* mobile boost */
     @media (max-width: 768px){
       .page{padding:12px;}
       .eyebrow{font-size:14px;padding:10px 14px;}
@@ -955,7 +918,6 @@
       .label,.toggle-row{font-size:17px;}
       input[type="number"],select{font-size:19px;min-height:56px;}
       .time-btn{font-size:17px;min-height:52px;}
-      .panic-chip{font-size:16px;padding:12px 16px;}
       .stat-label,.meta-pill .k,.timer-label{font-size:14px;}
       .stat-value,.meta-pill .v{font-size:28px;}
       .timer-value{font-size:46px;}
@@ -1200,11 +1162,6 @@
           </div>
         </div>
 
-        <div class="panic-controls" id="panicControls">
-          <button class="panic-chip active" id="panicVoiceBtn">Voice On</button>
-          <button class="panic-chip active" id="panicToneBtn">Tones On</button>
-        </div>
-
         <div class="orb-wrap">
           <div class="glow" id="glow"></div>
           <div class="orb" id="orb">
@@ -1426,8 +1383,6 @@
     const themeBtn = document.getElementById("themeBtn");
     const fullscreenBtn = document.getElementById("fullscreenBtn");
     const homeBtn = document.getElementById("homeBtn");
-    const panicVoiceBtn = document.getElementById("panicVoiceBtn");
-    const panicToneBtn = document.getElementById("panicToneBtn");
 
     function buildParticles() {
       particles.innerHTML = "";
@@ -1446,11 +1401,9 @@
 
     async function requestWakeLock() {
       try {
-        if ("wakeLock" in navigator && !wakeLock) {
-          wakeLock = await navigator.wakeLock.request("screen");
-          wakeLock.addEventListener("release", () => {
-            wakeLock = null;
-          });
+        if ('wakeLock' in navigator && !wakeLock) {
+          wakeLock = await navigator.wakeLock.request('screen');
+          wakeLock.addEventListener('release', () => { wakeLock = null; });
         }
       } catch (err) {
         console.log(`Wake Lock error: ${err.name}, ${err.message}`);
@@ -1468,43 +1421,28 @@
       }
     }
 
-    document.addEventListener("visibilitychange", async () => {
-      if (document.visibilityState === "visible" && isRunning) {
+    document.addEventListener('visibilitychange', async () => {
+      if (document.visibilityState === 'visible' && isRunning) {
         await requestWakeLock();
       }
     });
 
-    function refreshPanicButtons() {
-      const voiceOn = voiceToggle.checked && !silentToggle.checked;
-      const toneOn = beepToggle.checked && !silentToggle.checked;
-
-      panicVoiceBtn.classList.toggle("active", voiceOn);
-      panicToneBtn.classList.toggle("active", toneOn);
-
-      panicVoiceBtn.textContent = voiceOn ? "Voice On" : "Voice Off";
-      panicToneBtn.textContent = toneOn ? "Tones On" : "Tones Off";
-    }
-
     function showApp() {
       cover.style.display = "none";
       appShell.classList.add("active");
-      refreshPanicButtons();
 
-      window.scrollTo({
-        top: 0,
-        behavior: "auto"
-      });
-
-      document.body.scrollTop = 0;
-      document.documentElement.scrollTop = 0;
+      setTimeout(() => {
+        appShell.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      }, 50);
     }
 
     async function showHome() {
       await pauseSession();
       appShell.classList.remove("active");
-      appShell.classList.remove("panic-mode");
       cover.style.display = "grid";
-      refreshPanicButtons();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
@@ -1803,19 +1741,17 @@
       if (isSilent() || !voiceToggle.checked) return;
       if (!("speechSynthesis" in window)) return;
 
+      window.speechSynthesis.cancel();
+
       const utter = new SpeechSynthesisUtterance(text);
-      utter.rate = 0.92;
+      utter.rate = 0.84;
       utter.pitch = 1.0;
-      utter.volume = 1.0;
+      utter.volume = 1;
 
       const picked = getSelectedVoice();
       if (picked) utter.voice = picked;
 
-      window.speechSynthesis.cancel();
-
-      setTimeout(() => {
-        window.speechSynthesis.speak(utter);
-      }, 40);
+      window.speechSynthesis.speak(utter);
     }
 
     function speakPhaseOnly() {
@@ -1899,7 +1835,6 @@
       timerSub.textContent = "Session";
 
       updateUI();
-      refreshPanicButtons();
       const phaseType = getCurrentPhase().type;
       playPhaseTone(phaseType);
       speakPhaseOnly();
@@ -1933,59 +1868,18 @@
 
       if (render) renderTechniques();
       updateUI();
-      refreshPanicButtons();
       stateEl.textContent = "Ready";
       await releaseWakeLock();
     }
 
-    async function startFromMode(modeId) {
-      appShell.classList.remove("panic-mode");
-
+    function startFromMode(modeId) {
       selectTechnique(modeId, true);
       showApp();
-
-      await resetSession(false);
-      await startSession();
-
-      setTimeout(() => {
-        const orbWrap = document.querySelector(".orb-wrap");
-        if (orbWrap) {
-          orbWrap.scrollIntoView({
-            behavior: "auto",
-            block: "start"
-          });
-        }
-      }, 50);
+      startSession();
     }
 
     [...document.querySelectorAll("[data-start-mode]")].forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const mode = btn.dataset.startMode;
-
-        if (mode === "panic") {
-          appShell.classList.add("panic-mode");
-          selectTechnique("panic", true);
-          showApp();
-          await resetSession(false);
-          refreshPanicButtons();
-
-          window.scrollTo({ top: 0, behavior: "auto" });
-
-          const orbWrap = document.querySelector(".orb-wrap");
-          if (orbWrap) {
-            orbWrap.scrollIntoView({
-              behavior: "auto",
-              block: "start"
-            });
-          }
-
-          await startSession();
-          return;
-        }
-
-        appShell.classList.remove("panic-mode");
-        startFromMode(mode);
-      });
+      btn.addEventListener("click", () => startFromMode(btn.dataset.startMode));
     });
 
     [...timePresetGrid.querySelectorAll(".time-btn")].forEach(btn => {
@@ -2015,29 +1909,14 @@
         voiceToggle.checked = false;
         beepToggle.checked = false;
       }
-      refreshPanicButtons();
     });
 
     voiceToggle.addEventListener("change", () => {
       if (voiceToggle.checked) silentToggle.checked = false;
-      refreshPanicButtons();
     });
 
     beepToggle.addEventListener("change", () => {
       if (beepToggle.checked) silentToggle.checked = false;
-      refreshPanicButtons();
-    });
-
-    panicVoiceBtn.addEventListener("click", () => {
-      silentToggle.checked = false;
-      voiceToggle.checked = !voiceToggle.checked;
-      refreshPanicButtons();
-    });
-
-    panicToneBtn.addEventListener("click", () => {
-      silentToggle.checked = false;
-      beepToggle.checked = !beepToggle.checked;
-      refreshPanicButtons();
     });
 
     workSafeToggle.addEventListener("change", () => {
@@ -2062,10 +1941,7 @@
       window.speechSynthesis.onvoiceschanged = () => populateVoiceOptions();
     }
 
-    document.getElementById("startBtn").onclick = () => {
-      showApp();
-      startSession();
-    };
+    document.getElementById("startBtn").onclick = () => { showApp(); startSession(); };
     document.getElementById("pauseBtn").onclick = pauseSession;
     document.getElementById("resetBtn").onclick = () => resetSession();
 
@@ -2074,7 +1950,6 @@
     renderTimeButtons();
     setSessionMinutes(selectedTechnique.defaultMinutes);
     populateVoiceOptions();
-    refreshPanicButtons();
     updateUI();
   </script>
 </body>
