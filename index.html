@@ -214,6 +214,16 @@
     }
     .panic-chip.active{border-color:#9ad8ff;box-shadow:0 0 0 1px rgba(154,216,255,.18) inset;}
 
+    .status-note{
+      width:100%;
+      max-width:760px;
+      text-align:center;
+      color:var(--muted);
+      font-size:14px;
+      font-weight:700;
+      margin-top:-8px;
+    }
+
     .timer-orb{
       width:210px;height:210px;margin:auto;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;
       background:radial-gradient(circle at center, rgba(7,17,31,.92) 58%, transparent 59%), conic-gradient(#8fd3ff 0deg, rgba(255,255,255,.10) 0deg);
@@ -304,6 +314,7 @@
       input[type="number"],select{font-size:19px;min-height:56px;}
       .time-btn{font-size:17px;min-height:52px;}
       .panic-chip{font-size:16px;padding:12px 16px;}
+      .status-note{font-size:16px;}
       .stat-label,.meta-pill .k,.timer-label{font-size:14px;}
       .stat-value,.meta-pill .v{font-size:28px;}
       .timer-value{font-size:46px;}
@@ -415,7 +426,7 @@
             </div>
             <div class="benefit">
               <strong>Eyes-Closed Friendly</strong>
-              <span>Voice, tones, silent mode, and vibration are all supported.</span>
+              <span>Voice, tones, and silent mode are supported.</span>
             </div>
           </div>
         </div>
@@ -479,10 +490,6 @@
           <div class="toggle-row">
             <span>Silent mode</span>
             <input type="checkbox" id="silentToggle" />
-          </div>
-          <div class="toggle-row">
-            <span>Vibration</span>
-            <input type="checkbox" id="vibrationToggle" />
           </div>
           <div class="toggle-row">
             <span>Workplace mode</span>
@@ -554,6 +561,8 @@
           <button class="panic-chip active" id="panicVoiceBtn">Voice On</button>
           <button class="panic-chip active" id="panicToneBtn">Tones On</button>
         </div>
+
+        <div class="status-note" id="statusNote"></div>
 
         <div class="orb-wrap">
           <div class="glow" id="glow"></div>
@@ -676,7 +685,6 @@
     const voiceToggle = document.getElementById("voiceToggle");
     const beepToggle = document.getElementById("beepToggle");
     const silentToggle = document.getElementById("silentToggle");
-    const vibrationToggle = document.getElementById("vibrationToggle");
     const workSafeToggle = document.getElementById("workSafeToggle");
     const timerValue = document.getElementById("timerValue");
     const timerSub = document.getElementById("timerSub");
@@ -698,6 +706,7 @@
     const panicVoiceBtn = document.getElementById("panicVoiceBtn");
     const panicToneBtn = document.getElementById("panicToneBtn");
     const testVoiceBtn = document.getElementById("testVoiceBtn");
+    const statusNote = document.getElementById("statusNote");
 
     function buildParticles() {
       particles.innerHTML = "";
@@ -749,6 +758,8 @@
       panicToneBtn.classList.toggle("active", toneOn);
       panicVoiceBtn.textContent = voiceOn ? "Voice On" : "Voice Off";
       panicToneBtn.textContent = toneOn ? "Tones On" : "Tones Off";
+
+      statusNote.textContent = workSafeToggle.checked ? "Workplace mode active: visual only." : "";
     }
 
     function showApp() {
@@ -1006,12 +1017,6 @@
       return silentToggle.checked;
     }
 
-    function vibrate(pattern) {
-      if (!vibrationToggle.checked) return;
-      if (!("vibrate" in navigator)) return;
-      navigator.vibrate(pattern);
-    }
-
     function playTone(freq = 440, duration = 0.14, vol = 0.07, type = "sine") {
       if (isSilent() || !beepToggle.checked) return;
       ensureAudio();
@@ -1038,7 +1043,6 @@
       if (phaseType === "exhale") playTone(220, 0.09, 0.06, "sine");
       else if (phaseType === "hold") playTone(330, 0.09, 0.055, "triangle");
       else playTone(440, 0.09, 0.06, "triangle");
-      vibrate(18);
     }
 
     function playPhaseTone(type) {
@@ -1046,9 +1050,6 @@
       else if (type === "hold") playTone(330, 0.14, 0.06, "triangle");
       else if (type === "exhale") playTone(220, 0.18, 0.07, "sine");
       else playTone(440, 0.10, 0.055, "triangle");
-      if (type === "inhale") vibrate([35]);
-      if (type === "hold") vibrate([20, 40, 20]);
-      if (type === "exhale") vibrate([45]);
     }
 
     function playEndChime() {
@@ -1057,7 +1058,6 @@
       playTone(330, 0.14, 0.06, "sine");
       setTimeout(() => playTone(440, 0.16, 0.06, "sine"), 180);
       setTimeout(() => playTone(520, 0.26, 0.06, "sine"), 380);
-      vibrate([40, 70, 40]);
     }
 
     function getSelectedVoice() {
@@ -1220,9 +1220,7 @@
 
       setTimeout(() => {
         const orbWrap = document.querySelector(".orb-wrap");
-        if (orbWrap) {
-          orbWrap.scrollIntoView({ behavior: "auto", block: "start" });
-        }
+        if (orbWrap) orbWrap.scrollIntoView({ behavior: "auto", block: "start" });
       }, 50);
     }
 
@@ -1276,7 +1274,6 @@
       if (silentToggle.checked) {
         voiceToggle.checked = false;
         beepToggle.checked = false;
-        vibrationToggle.checked = false;
         if ("speechSynthesis" in window) window.speechSynthesis.cancel();
       }
       refreshPanicButtons();
@@ -1311,20 +1308,17 @@
       if (on) {
         savedSettings = {
           voice: voiceToggle.checked,
-          beep: beepToggle.checked,
-          vibrate: vibrationToggle.checked
+          beep: beepToggle.checked
         };
 
         voiceToggle.checked = false;
         beepToggle.checked = false;
-        vibrationToggle.checked = false;
         silentToggle.checked = true;
 
         if ("speechSynthesis" in window) window.speechSynthesis.cancel();
       } else {
         voiceToggle.checked = savedSettings.voice ?? true;
         beepToggle.checked = savedSettings.beep ?? true;
-        vibrationToggle.checked = savedSettings.vibrate ?? false;
         silentToggle.checked = false;
       }
 
